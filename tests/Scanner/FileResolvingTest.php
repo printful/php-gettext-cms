@@ -1,40 +1,40 @@
 <?php
 /** @noinspection PhpUnhandledExceptionInspection */
 
-namespace Printful\GettextCms\Tests\Scanner;
+namespace Printful\GettextCms\Tests\Extractor;
 
 use Printful\GettextCms\Exceptions\InvalidPathException;
 use Printful\GettextCms\Structures\ScanItem;
 use Printful\GettextCms\Tests\TestCase;
-use Printful\GettextCms\TranslationScanner;
+use Printful\GettextCms\MessageExtractor;
 
-class ScannerTest extends TestCase
+class FileResolvingTest extends TestCase
 {
-    /** @var TranslationScanner */
+    /** @var MessageExtractor */
     private $scanner;
 
     protected function setUp()
     {
         parent::setUp();
-        $this->scanner = new TranslationScanner;
+        $this->scanner = new MessageExtractor;
     }
 
     public function testExceptionOnInvalidPath()
     {
         self::expectException(InvalidPathException::class);
 
-        $this->scanner->resolveFiles([new ScanItem('invalid-path')]);
+        $this->scanner->resolvePathnames([new ScanItem('invalid-path')]);
     }
 
     public function testFilesAreResolved()
     {
         $dir = $this->getAssetPath() . '/dummy-directory';
 
-        $files = $this->scanner->resolveFiles([new ScanItem($dir, ['php'])]);
+        $files = $this->scanner->resolvePathnames([new ScanItem($dir, ['php'])]);
 
         self::assertCount(3, $files, 'Found php file count matches');
 
-        $files = $this->scanner->resolveFiles([new ScanItem($dir, ['txt'])]);
+        $files = $this->scanner->resolvePathnames([new ScanItem($dir, ['txt'])]);
         self::assertCount(1, $files, 'One txt file is found');
     }
 
@@ -42,12 +42,30 @@ class ScannerTest extends TestCase
     {
         $dir = $this->getAssetPath();
 
-        $files = $this->scanner->resolveFiles([
+        $files = $this->scanner->resolvePathnames([
             new ScanItem($dir . '/dummy-directory/sub-directory', ['php']),
             new ScanItem($dir . '/dummy-directory/sub-directory2/', ['php']),
         ]);
 
         self::assertCount(2, $files, 'Two files are found in separate directories');
+    }
+
+    public function testSingleFileResolving()
+    {
+        $files = $this->scanner->resolvePathnames([
+            new ScanItem($this->getAssetPath() . '/dummy-directory/dummy-file.php'),
+        ]);
+
+        self::assertCount(1, $files, 'One file is found');
+    }
+
+    public function testNonRecursiveScan()
+    {
+        $files = $this->scanner->resolvePathnames([
+            new ScanItem($this->getAssetPath() . '/dummy-directory', [], false),
+        ]);
+
+        self::assertCount(1, $files, 'One file is found non-recursively');
     }
 
     /**

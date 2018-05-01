@@ -21,12 +21,20 @@ class ScanItem
     public $extensions = [];
 
     /**
+     * Scan directory recursively
+     * @var bool
+     */
+    public $recursive;
+
+    /**
      * @param string $path Path to a directory or a file to scan
      * @param array $extensions List of extensions to scan for
+     * @param bool $recursive Scan directory recursively
      */
-    public function __construct($path, array $extensions = [])
+    public function __construct($path, array $extensions = [], $recursive = true)
     {
         $this->path = $path;
         $this->extensions = $extensions;
+        $this->recursive = $recursive;
     }
 }

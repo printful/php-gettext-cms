@@ -1,4 +1,6 @@
 <?php
 
+dgettext('custom-domain', 'custom-domain-message');
 
-echo __('Greetings');
+gettext('default-message-1');
+gettext('default-message-2');
