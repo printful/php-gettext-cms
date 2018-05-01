@@ -13,6 +13,7 @@
     <testsuites>
         <testsuite name="Printful GettextCms Test Suite">
             <directory suffix=".php">./tests/</directory>
+            <exclude>./tests/assets</exclude>
         </testsuite>
     </testsuites>
 </phpunit>
