@@ -77,7 +77,9 @@ class MessageExtractor
     {
         $extractor = $this->getExtractor($pathname);
 
-        $extractor::fromFile($pathname, $translations);
+        $extractor::fromFile($pathname, $translations, [
+            'domainOnly' => $translations->hasDomain(), // We scan for messages that match our needed domain only
+        ]);
     }
 
     /**

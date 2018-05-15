@@ -55,9 +55,11 @@ class MessageExtractionTest extends TestCase
     {
         $domain = 'custom-domain';
 
-        $allTranslations = $this->scanner->extract([
+        $items = [
             new ScanItem($this->getDummyFile()),
-        ], false, [$domain]);
+        ];
+
+        $allTranslations = $this->scanner->extract($items, false, [$domain]);
 
         self::assertCount(1, $allTranslations, 'One domain only scanned');
 
@@ -67,8 +69,7 @@ class MessageExtractionTest extends TestCase
             return $t->getOriginal();
         }, (array)$translations);
 
-        // TODO until we can't scan only for a certain domain messages, this won't pass
-        //self::assertEquals(1, $translations->count(), 'One message exists');
+        self::assertEquals(1, $translations->count(), 'One message exists');
 
         self::assertEquals($domain, $translations->getDomain(), 'Domain matches');
         self::assertContains('custom-domain-message', $messages, 'Domain message is present');
