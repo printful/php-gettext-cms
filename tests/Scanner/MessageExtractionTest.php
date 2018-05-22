@@ -5,7 +5,11 @@
 namespace Printful\GettextCms\Tests\Extractor;
 
 
+use Gettext\Translation;
+use Gettext\Translations;
+use Mockery;
 use Printful\GettextCms\Exceptions\UnknownExtractorException;
+use Printful\GettextCms\Interfaces\MessageConfigInterface;
 use Printful\GettextCms\MessageExtractor;
 use Printful\GettextCms\Structures\ScanItem;
 use Printful\GettextCms\Tests\TestCase;
@@ -15,10 +19,20 @@ class MessageExtractionTest extends TestCase
     /** @var MessageExtractor */
     private $scanner;
 
+    /** @var Mockery\Mock|MessageConfigInterface */
+    private $mockConfig;
+
+    const DOMAIN_DEFAULT = 'default';
+
     protected function setUp()
     {
         parent::setUp();
-        $this->scanner = new MessageExtractor;
+
+        $this->mockConfig = Mockery::mock(MessageConfigInterface::class);
+        $this->setDefaultDomain(self::DOMAIN_DEFAULT);
+        $this->setOtherDomains([]);
+
+        $this->scanner = new MessageExtractor($this->mockConfig);
     }
 
     public function testUnknownExtractorFails()
@@ -39,9 +53,9 @@ class MessageExtractionTest extends TestCase
         $translations = array_pop($allTranslations);
 
         self::assertEquals(2, $translations->count(), 'Scanned message count matches');
-        self::assertEquals('', $translations->getDomain(), 'Domain is empty');
+        self::assertEquals(self::DOMAIN_DEFAULT, $translations->getDomain(), 'Domain is empty');
 
-        $messages = array_map(function (\Gettext\Translation $t) {
+        $messages = array_map(function (Translation $t) {
             return $t->getOriginal();
         }, (array)$translations);
 
@@ -55,24 +69,29 @@ class MessageExtractionTest extends TestCase
     {
         $domain = 'custom-domain';
 
+        $this->setOtherDomains([$domain]);
+
         $items = [
             new ScanItem($this->getDummyFile()),
         ];
 
-        $allTranslations = $this->scanner->extract($items, false, [$domain]);
+        $allTranslations = $this->scanner->extract($items);
 
-        self::assertCount(1, $allTranslations, 'One domain only scanned');
+        self::assertCount(2, $allTranslations, 'Two domains scanned, default and custom');
 
-        $translations = array_pop($allTranslations);
-
-        $messages = array_map(function (\Gettext\Translation $t) {
-            return $t->getOriginal();
-        }, (array)$translations);
+        // Find translation for our domain
+        /** @var Translations|Translation[] $translations */
+        $translations = array_reduce($allTranslations, function (&$carry, Translations $t) use ($domain) {
+            if ($t->getDomain() === $domain) {
+                return $t;
+            }
+            return $carry;
+        }, null);
 
         self::assertEquals(1, $translations->count(), 'One message exists');
 
         self::assertEquals($domain, $translations->getDomain(), 'Domain matches');
-        self::assertContains('custom-domain-message', $messages, 'Domain message is present');
+        self::assertContains('custom-domain-message', reset($translations)->getOriginal(), 'Domain message is present');
     }
 
     public function testExtractSpecificFunctions()
@@ -96,5 +115,15 @@ class MessageExtractionTest extends TestCase
     private function getDummyFile(): string
     {
         return __DIR__ . '/../assets/dummy-directory/dummy-file.php';
+    }
+
+    private function setDefaultDomain(string $domain)
+    {
+        $this->mockConfig->shouldReceive('getDefaultDomain')->andReturn($domain)->byDefault();
+    }
+
+    private function setOtherDomains(array $domains)
+    {
+        $this->mockConfig->shouldReceive('getOtherDomains')->andReturn($domains)->byDefault();
     }
 }

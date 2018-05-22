@@ -15,6 +15,7 @@ use League\Flysystem\Plugin\ListFiles;
 use Printful\GettextCms\Exceptions\GettextCmsException;
 use Printful\GettextCms\Exceptions\InvalidPathException;
 use Printful\GettextCms\Exceptions\UnknownExtractorException;
+use Printful\GettextCms\Interfaces\MessageConfigInterface;
 use Printful\GettextCms\Structures\ScanItem;
 
 class MessageExtractor
@@ -25,30 +26,49 @@ class MessageExtractor
         'php' => PhpCode::class,
     ];
 
+    /** @var MessageConfigInterface */
+    private $config;
+
+    /**
+     * @param MessageConfigInterface $config
+     */
+    public function __construct(MessageConfigInterface $config)
+    {
+        $this->config = $config;
+    }
+
     /**
      * @param ScanItem[] $items
-     * @param bool $defaultDomain Should we scan for translations in default domain (no domain messages)
-     * @param array $otherDomains List of domains we should search (excluding the default domain
-     * @return Translations[] List of translation files for each domain we wanted to extract
+     * @return Translations[] List of translation files extracted (for each domain)
      * @throws GettextCmsException
      */
-    public function extract(array $items, bool $defaultDomain = true, array $otherDomains = [])
+    public function extract(array $items)
     {
-        if ($defaultDomain) {
-            // If we search for default domain, add an empty domain string
-            $otherDomains[] = '';
-        }
+        $defaultDomain = $this->config->getDefaultDomain();
+        $domains = $this->config->getOtherDomains();
+        $domains[] = $defaultDomain;
 
         $allTranslations = [];
 
-        foreach ($otherDomains as $domain) {
+        foreach ($domains as $domain) {
             $translations = new Translations;
-            $translations->setDomain($domain);
+
+            // When we scan for default domain, we have to specify an empty value
+            // otherwise we would search for domain function calls with this domain
+            // For example, empty domain will find string like __("message")
+            // But if a domain is specified, it will look for dgettext("custom-domain", "message")
+            if ($domain !== $defaultDomain) {
+                $translations->setDomain($domain);
+            }
 
             foreach ($items as $item) {
                 // Scan for this item, translations will be merged with all domain translations
                 $this->extractForDomain($item, $translations);
             }
+
+            // Always set the domain even if it is the default one
+            $translations->setDomain($domain);
+
             $allTranslations[] = $translations;
         }
 
@@ -97,7 +117,7 @@ class MessageExtractor
     }
 
     /**
-     * Returns a list of files that match this item
+     * Returns a list of files that match this item (if single file, then an array with a single pathname)
      *
      * @param ScanItem $item
      * @return array List of matching pathnames
@@ -117,6 +137,8 @@ class MessageExtractor
     }
 
     /**
+     * If scan item is for a directory, this will create a list of matching files
+     *
      * @param ScanItem $item
      * @return string[] List of pathnames to files
      */

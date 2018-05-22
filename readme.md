@@ -21,7 +21,6 @@
     * export directories
     * interface for file storage
     * interface for exported js storage
-    * Which functions to scan for (defaults are known)
     
 * Store in database
     * Extensions (from references)

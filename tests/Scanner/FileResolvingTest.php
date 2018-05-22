@@ -3,7 +3,9 @@
 
 namespace Printful\GettextCms\Tests\Extractor;
 
+use Mockery;
 use Printful\GettextCms\Exceptions\InvalidPathException;
+use Printful\GettextCms\Interfaces\MessageConfigInterface;
 use Printful\GettextCms\MessageExtractor;
 use Printful\GettextCms\Structures\ScanItem;
 use Printful\GettextCms\Tests\TestCase;
@@ -16,7 +18,11 @@ class FileResolvingTest extends TestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->scanner = new MessageExtractor;
+
+        /** @var MessageConfigInterface $config */
+        $config = Mockery::mock(MessageConfigInterface::class);
+
+        $this->scanner = new MessageExtractor($config);
     }
 
     public function testExceptionOnInvalidPath()
