@@ -29,7 +29,7 @@ class MessageStorage
         }
     }
 
-    private function saveSingleTranslation(string $locale, string $domain, Translation $translation): void
+    private function saveSingleTranslation(string $locale, string $domain, Translation $translation)
     {
         $key = $this->getKey($locale, $domain, $translation);
 
