@@ -10,10 +10,17 @@
          stopOnFailure="false"
          syntaxCheck="false"
 >
+    <filter>
+        <whitelist>
+            <directory>./src/</directory>
+        </whitelist>
+    </filter>
+
     <testsuites>
         <testsuite name="Printful GettextCms Test Suite">
             <directory suffix=".php">./tests/</directory>
             <exclude>./tests/assets</exclude>
+            <exclude>./tests/Stubs</exclude>
         </testsuite>
     </testsuites>
 </phpunit>
