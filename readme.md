@@ -24,8 +24,6 @@
     * Which functions to scan for (defaults are known)
     
 * Store in database
-    * Comments
-    * References
     * Extensions (from references)
     * Is JS translation
     

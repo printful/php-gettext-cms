@@ -75,6 +75,21 @@ class MessageExtractionTest extends TestCase
         self::assertContains('custom-domain-message', $messages, 'Domain message is present');
     }
 
+    public function testExtractSpecificFunctions()
+    {
+        $allTranslations = $this->scanner->extract([
+            new ScanItem($this->getDummyFile(), null, true, ['my_custom_function' => 'gettext']),
+        ]);
+
+        $translations = array_shift($allTranslations);
+
+        $translation = $translations->find('', 'custom function translation');
+
+        self::assertEquals(['Extracted comment'], $translation->getExtractedComments(), 'Comment was extracted');
+        self::assertNotFalse($translation, 'Translation was found');
+        self::assertCount(1, $translations, 'Only one translation was found for custom function');
+    }
+
     /**
      * @return string
      */

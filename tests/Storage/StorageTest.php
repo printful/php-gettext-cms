@@ -71,7 +71,7 @@ class StorageTest extends TestCase
 
         $newTranslations = new Translations;
         $newTranslations->setLanguage('lv_LV');
-        $newTranslations->offsetSet(null, $t2);
+        $newTranslations[] = $t2;
 
         $this->storage->saveTranslations($newTranslations);
 

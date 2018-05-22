@@ -34,35 +34,41 @@ class MessageExtractor
      */
     public function extract(array $items, bool $defaultDomain = true, array $otherDomains = [])
     {
-        $pathnames = $this->resolvePathnames($items);
-
         if ($defaultDomain) {
             // If we search for default domain, add an empty domain string
             $otherDomains[] = '';
         }
 
-        $translations = [];
+        $allTranslations = [];
 
         foreach ($otherDomains as $domain) {
-            $translations[] = $this->extractForDomain($domain, $pathnames);
+            $translations = new Translations;
+            $translations->setDomain($domain);
+
+            foreach ($items as $item) {
+                // Scan for this item, translations will be merged with all domain translations
+                $this->extractForDomain($item, $translations);
+            }
+            $allTranslations[] = $translations;
         }
 
-        return $translations;
+        return $allTranslations;
     }
 
     /**
-     * @param string $domain
-     * @param array $pathnames
+     * @param ScanItem $scanItem
+     * @param Translations $translations
      * @return Translations
+     * @throws InvalidPathException
      * @throws UnknownExtractorException
      */
-    private function extractForDomain($domain, array $pathnames)
+    private function extractForDomain(ScanItem $scanItem, Translations $translations)
     {
-        $translations = new Translations;
-        $translations->setDomain($domain);
+        $pathnames = $this->resolvePathnames($scanItem);
 
         foreach ($pathnames as $pathname) {
-            $this->extractFileMessages($pathname, $translations);
+            // Translations will be merged with given object
+            $this->extractFileMessages($pathname, $translations, $scanItem->functions);
         }
 
         return $translations;
@@ -71,27 +77,23 @@ class MessageExtractor
     /**
      * @param $pathname
      * @param Translations $translations
+     * @param array|null $functions Optional functions to scan for
      * @throws UnknownExtractorException
      */
-    private function extractFileMessages($pathname, Translations $translations)
+    private function extractFileMessages($pathname, Translations $translations, array $functions = null)
     {
         $extractor = $this->getExtractor($pathname);
 
-        $extractor::fromFile($pathname, $translations, [
+        $options = [
+            'extractComments' => '', // This extracts comments above function call
             'domainOnly' => $translations->hasDomain(), // We scan for messages that match our needed domain only
-        ]);
-    }
+        ];
 
-    /**
-     * @param ScanItem[] $items
-     * @return array Pathnames to matching files
-     */
-    public function resolvePathnames(array $items): array
-    {
-        return array_reduce($items, function (&$carry, ScanItem $item) {
-            $carry = array_merge($carry, $this->resolveSingleItemFiles($item));
-            return $carry;
-        }, []);
+        if ($functions) {
+            $options['functions'] = $functions;
+        }
+
+        $extractor::fromFile($pathname, $translations, $options);
     }
 
     /**
@@ -101,7 +103,7 @@ class MessageExtractor
      * @return array List of matching pathnames
      * @throws InvalidPathException
      */
-    private function resolveSingleItemFiles(ScanItem $item): array
+    public function resolvePathnames(ScanItem $item): array
     {
         if (is_file($item->path)) {
             return [$item->path];

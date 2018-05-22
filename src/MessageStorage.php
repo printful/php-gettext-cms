@@ -117,7 +117,7 @@ class MessageStorage
 
         foreach ($items as $v) {
             $translation = $this->itemToTranslation($v);
-            $translations->offsetSet(null, $translation);
+            $translations[] = $translation;
         }
 
         return $translations;
