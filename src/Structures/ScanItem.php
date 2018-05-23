@@ -28,7 +28,6 @@ class ScanItem
      * Default values can be found here, for example:
      * @see \Gettext\Extractors\JsCode::$options
      * @see \Gettext\Extractors\PhpCode::$options
-
      *
      * @var array If null, we use default functions from Gettext library (standard gettext functions)
      */

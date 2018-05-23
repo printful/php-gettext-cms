@@ -1,8 +1,2 @@
-build:
-    tests:
-        override:
-            -
-                command: 'vendor/bin/phpunit --coverage-clover=coverage-log'
-                coverage:
-                    file: 'coverage-log'
-                    format: 'clover'
+tools:
+    external_code_coverage: true
