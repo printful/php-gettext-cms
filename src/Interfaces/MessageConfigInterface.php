@@ -31,4 +31,11 @@ interface MessageConfigInterface
      * @return string[]
      */
     public function getOtherDomains(): array;
+
+    /**
+     * Absolute directory path where .mo translation files will be exported 
+     * 
+     * @return string
+     */
+    public function getMoDirectory(): string;
 }
