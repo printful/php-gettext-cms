@@ -25,6 +25,7 @@ interface MessageRepositoryInterface
 
     /**
      * Retrieve list of messages (disabled and enabled) from a specific locale and domain
+     * Includes untranslated messages
      *
      * @param string $locale
      * @param string $domain
@@ -34,12 +35,22 @@ interface MessageRepositoryInterface
 
     /**
      * Retrieve list of enabled messages from a specific locale and domain
+     * Includes untranslated messages
      *
      * @param string $locale
      * @param string $domain
      * @return MessageItem[]
      */
     public function getEnabled(string $locale, string $domain): array;
+
+    /**
+     * Retrieve list of enabled and translated messages from a specific locale and domain
+     *
+     * @param string $locale
+     * @param string $domain
+     * @return MessageItem[]
+     */
+    public function getEnabledTranslated($locale, $domain): array;
 
     /**
      * Mark all messages in the given domain and locale as disabled

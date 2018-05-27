@@ -33,7 +33,7 @@ class MessageExporter
      */
     public function export(string $locale, string $domain)
     {
-        $translations = $this->storage->getAllTranslations($locale, $domain);
+        $translations = $this->storage->getAll($locale, $domain);
 
         $pathname = $this->getMoPathname($locale, $domain);
 

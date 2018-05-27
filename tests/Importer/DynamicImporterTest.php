@@ -44,7 +44,7 @@ class DynamicImporterTest extends TestCase
             ->add('T2', 'ctx2')
             ->saveAndDisabledPrevious($domain);
 
-        $translations = $this->storage->getAllTranslations($locale, $domain);
+        $translations = $this->storage->getAll($locale, $domain);
 
         self::assertCount(3, $translations, 'Two translations exist');
         self::assertNotFalse($translations->find('', 'T1'), 'T1 is found');
@@ -69,7 +69,7 @@ class DynamicImporterTest extends TestCase
             ->add('T3')
             ->saveAndDisabledPrevious($domain);
 
-        $translations = $this->storage->getEnabledTranslations($locale, $domain);
+        $translations = $this->storage->getAllEnabled($locale, $domain);
 
         self::assertFalse($translations->find('', 'T1'), 'T1 was disabled');
         self::assertNotFalse($translations->find('', 'T2'), 'T2 is present');

@@ -45,6 +45,18 @@ class MessageItem
     public $isDisabled = false;
 
     /**
+     * This indicates if original is translated, but plural translations can be missing
+     * @var bool
+     */
+    public $isTranslated = false;
+
+    /**
+     * This indicates if string has to be translated/checked, can be missing plural translation
+     * @var bool
+     */
+    public $needsChecking = false;
+
+    /**
      * @var string
      */
     public $originalPlural = '';

@@ -4,6 +4,7 @@ namespace Printful\GettextCms;
 
 use Gettext\Translation;
 use Gettext\Translations;
+use Printful\GettextCms\Exceptions\InvalidTranslationException;
 use Printful\GettextCms\Interfaces\MessageRepositoryInterface;
 use Printful\GettextCms\Structures\MessageItem;
 
@@ -20,10 +21,24 @@ class MessageStorage
         $this->repository = $repository;
     }
 
+    /**
+     * Save translation object for a single domain and locale
+     *
+     * @param Translations $translations
+     * @throws InvalidTranslationException
+     */
     public function saveTranslations(Translations $translations)
     {
         $locale = $translations->getLanguage();
         $domain = (string)$translations->getDomain();
+
+        if (!$locale) {
+            throw new InvalidTranslationException('Locale is missing');
+        }
+
+        if (!$domain) {
+            throw new InvalidTranslationException('Domain is missing');
+        }
 
         foreach ($translations as $v) {
             $this->saveSingleTranslation($locale, $domain, $v);
@@ -45,6 +60,13 @@ class MessageStorage
             $item->isDisabled = $translation->isDisabled();
         } else {
             $item = $this->translationToItem($locale, $domain, $translation);
+        }
+
+        $item->isTranslated = $translation->hasTranslation();
+        $item->needsChecking = !$translation->hasTranslation();
+
+        if ($translation->hasPlural() && !$translation->hasPluralTranslations()) {
+            $item->needsChecking = true;
         }
 
         $this->repository->save($item);
@@ -107,30 +129,42 @@ class MessageStorage
     }
 
     /**
-     * Get all translations (disabled and enabled)
+     * All translations, including disabled, enabled and untranslated
      *
      * @param string $locale
      * @param $domain
      * @return Translations
      */
-    public function getAllTranslations(string $locale, $domain): Translations
+    public function getAll(string $locale, $domain): Translations
     {
-        return $this->getTranslations($locale, $domain, false);
+        return $this->getTranslations($locale, $domain, false, false);
     }
 
     /**
-     * Get all translations (disabled and enabled)
+     * All enabled translations including untranslated
      *
      * @param string $locale
      * @param $domain
      * @return Translations
      */
-    public function getEnabledTranslations(string $locale, $domain): Translations
+    public function getAllEnabled(string $locale, $domain): Translations
     {
-        return $this->getTranslations($locale, $domain, true);
+        return $this->getTranslations($locale, $domain, true, false);
     }
 
-    private function getTranslations(string $locale, $domain, bool $enabledOnly): Translations
+    /**
+     * Enabled and translated translations only
+     *
+     * @param string $locale
+     * @param $domain
+     * @return Translations
+     */
+    public function getEnabledTranslated(string $locale, $domain): Translations
+    {
+        return $this->getTranslations($locale, $domain, true, true);
+    }
+
+    private function getTranslations(string $locale, $domain, bool $enabledOnly, bool $translatedOnly): Translations
     {
         $domain = (string)$domain;
 
@@ -138,7 +172,9 @@ class MessageStorage
         $translations->setDomain($domain);
         $translations->setLanguage($locale);
 
-        if ($enabledOnly) {
+        if ($enabledOnly && $translatedOnly) {
+            $items = $this->repository->getEnabledTranslated($locale, $domain);
+        } elseif ($enabledOnly) {
             $items = $this->repository->getEnabled($locale, $domain);
         } else {
             $items = $this->repository->getAll($locale, $domain);

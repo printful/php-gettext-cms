@@ -45,6 +45,16 @@ class MessageRepositoryStub implements MessageRepositoryInterface
     /**
      * @inheritdoc
      */
+    public function getEnabledTranslated($locale, $domain): array
+    {
+        return array_filter($this->getEnabled($locale, $domain), function (MessageItem $item) {
+            return $item->isTranslated;
+        });
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getSingle($key): MessageItem
     {
         foreach ($this->store as $v) {
