@@ -47,7 +47,7 @@ class StorageTest extends TestCase
 
         $this->storage->saveTranslations($translations);
 
-        $translationsFound = $this->storage->getTranslations($translations->getLanguage(), $translations->getDomain());
+        $translationsFound = $this->storage->getAllTranslations($translations->getLanguage(), $translations->getDomain());
 
         self::assertEquals($translations, $translationsFound, 'Original and returned translations are equal');
     }
@@ -75,7 +75,7 @@ class StorageTest extends TestCase
 
         $this->storage->saveTranslations($newTranslations);
 
-        $returned = $this->storage->getTranslations($translations->getLanguage(), $translations->getDomain());
+        $returned = $this->storage->getAllTranslations($translations->getLanguage(), $translations->getDomain());
 
         $found = $returned->find('', 'Text');
 

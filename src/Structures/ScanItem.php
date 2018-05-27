@@ -1,9 +1,10 @@
 <?php
 
-
 namespace Printful\GettextCms\Structures;
 
-
+/**
+ * Class represents configuration for scanning a directory or a single file for translation messages
+ */
 class ScanItem
 {
     /**

@@ -83,10 +83,6 @@ class ExporterTest extends TestCase
         $this->exporter->export('en_US', 'domain');
     }
 
-    /**
-     * @param MessageItem[] $messages
-     * @param string $moPathname
-     */
     private function verifyTranslations(array $messages, string $locale, string $domain, string $moPathname)
     {
         $translations = new Translations;

@@ -1,14 +1,15 @@
 <?php
 
-
 namespace Printful\GettextCms;
-
 
 use Gettext\Translation;
 use Gettext\Translations;
 use Printful\GettextCms\Interfaces\MessageRepositoryInterface;
 use Printful\GettextCms\Structures\MessageItem;
 
+/**
+ * Class handles all saving and retrieving logic of translations using the given repository
+ */
 class MessageStorage
 {
     /** @var MessageRepositoryInterface */
@@ -29,7 +30,7 @@ class MessageStorage
         }
     }
 
-    private function saveSingleTranslation(string $locale, string $domain, Translation $translation)
+    public function saveSingleTranslation(string $locale, string $domain, Translation $translation)
     {
         $key = $this->getKey($locale, $domain, $translation);
 
@@ -105,7 +106,31 @@ class MessageStorage
         return $item;
     }
 
-    public function getTranslations(string $locale, $domain): Translations
+    /**
+     * Get all translations (disabled and enabled)
+     *
+     * @param string $locale
+     * @param $domain
+     * @return Translations
+     */
+    public function getAllTranslations(string $locale, $domain): Translations
+    {
+        return $this->getTranslations($locale, $domain, false);
+    }
+
+    /**
+     * Get all translations (disabled and enabled)
+     *
+     * @param string $locale
+     * @param $domain
+     * @return Translations
+     */
+    public function getEnabledTranslations(string $locale, $domain): Translations
+    {
+        return $this->getTranslations($locale, $domain, true);
+    }
+
+    private function getTranslations(string $locale, $domain, bool $enabledOnly): Translations
     {
         $domain = (string)$domain;
 
@@ -113,7 +138,11 @@ class MessageStorage
         $translations->setDomain($domain);
         $translations->setLanguage($locale);
 
-        $items = $this->repository->getAll($locale, $domain);
+        if ($enabledOnly) {
+            $items = $this->repository->getEnabled($locale, $domain);
+        } else {
+            $items = $this->repository->getAll($locale, $domain);
+        }
 
         foreach ($items as $v) {
             $translation = $this->itemToTranslation($v);
@@ -121,5 +150,16 @@ class MessageStorage
         }
 
         return $translations;
+    }
+
+    /**
+     * Mark all messages in the given domain and locale as disabled
+     *
+     * @param string $locale
+     * @param string $domain
+     */
+    public function disableAll(string $locale, string $domain)
+    {
+        $this->repository->disableAll($locale, $domain);
     }
 }

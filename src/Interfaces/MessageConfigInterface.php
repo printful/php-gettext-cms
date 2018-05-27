@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Printful\GettextCms\Interfaces;
-
 
 interface MessageConfigInterface
 {
@@ -16,7 +14,7 @@ interface MessageConfigInterface
      *
      * @return MessageRepositoryInterface
      */
-    public function getRepository() : MessageRepositoryInterface;
+    public function getRepository(): MessageRepositoryInterface;
 
     /**
      * Domain name that will be bound as the default domain for gettext function usage (without specifying a domain)
@@ -33,8 +31,8 @@ interface MessageConfigInterface
     public function getOtherDomains(): array;
 
     /**
-     * Absolute directory path where .mo translation files will be exported 
-     * 
+     * Absolute directory path where .mo translation files will be exported
+     *
      * @return string
      */
     public function getMoDirectory(): string;

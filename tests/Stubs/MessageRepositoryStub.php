@@ -34,6 +34,17 @@ class MessageRepositoryStub implements MessageRepositoryInterface
     /**
      * @inheritdoc
      */
+    public function getEnabled(string $locale, string $domain): array
+    {
+        return array_filter($this->getAll($locale, $domain), function (MessageItem $item) {
+            return !$item->isDisabled;
+        });
+
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getSingle($key): MessageItem
     {
         foreach ($this->store as $v) {
@@ -43,5 +54,18 @@ class MessageRepositoryStub implements MessageRepositoryInterface
         }
 
         return new MessageItem;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function disableAll(string $locale, string $domain)
+    {
+        $this->store = array_map(function (MessageItem $item) use ($locale, $domain) {
+            if ($item->domain === $domain && $item->locale === $locale) {
+                $item->isDisabled = true;
+            }
+            return $item;
+        }, $this->store);
     }
 }

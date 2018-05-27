@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Printful\GettextCms\Exceptions;
-
 
 use Exception;
 

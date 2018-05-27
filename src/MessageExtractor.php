@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Printful\GettextCms;
-
 
 use Gettext\Extractors\Extractor;
 use Gettext\Extractors\JsCode;
@@ -18,6 +16,9 @@ use Printful\GettextCms\Exceptions\UnknownExtractorException;
 use Printful\GettextCms\Interfaces\MessageConfigInterface;
 use Printful\GettextCms\Structures\ScanItem;
 
+/**
+ * Class extracts gettext function calls from source files and converts them to Translation objects
+ */
 class MessageExtractor
 {
     const EXTRACTORS = [
@@ -42,7 +43,7 @@ class MessageExtractor
      * @return Translations[] List of translation files extracted (for each domain)
      * @throws GettextCmsException
      */
-    public function extract(array $items)
+    public function extract(array $items): array
     {
         $defaultDomain = $this->config->getDefaultDomain();
         $domains = $this->config->getOtherDomains();
@@ -82,7 +83,7 @@ class MessageExtractor
      * @throws InvalidPathException
      * @throws UnknownExtractorException
      */
-    private function extractForDomain(ScanItem $scanItem, Translations $translations)
+    private function extractForDomain(ScanItem $scanItem, Translations $translations): Translations
     {
         $pathnames = $this->resolvePathnames($scanItem);
 
@@ -142,7 +143,7 @@ class MessageExtractor
      * @param ScanItem $item
      * @return string[] List of pathnames to files
      */
-    private function resolveDirectoryFiles(ScanItem $item)
+    private function resolveDirectoryFiles(ScanItem $item): array
     {
         $dir = realpath($item->path);
 
@@ -166,10 +167,10 @@ class MessageExtractor
 
     /**
      * @param string $pathname Full path to file
-     * @return Extractor
+     * @return Extractor|string Name of the extraction class for the given file
      * @throws UnknownExtractorException
      */
-    private function getExtractor($pathname)
+    private function getExtractor($pathname): string
     {
         $extension = pathinfo($pathname, PATHINFO_EXTENSION);
 
