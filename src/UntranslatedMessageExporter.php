@@ -20,9 +20,9 @@ class UntranslatedMessageExporter
     /**
      * @param string $locale
      * @param string $domain
-     * @return bool
+     * @return string
      */
-    public function exportToString(string $locale, string $domain)
+    public function exportToString(string $locale, string $domain): string
     {
         $translations = $this->storage->getRequiresTranslating($locale, $domain);
 
