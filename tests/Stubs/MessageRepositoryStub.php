@@ -85,7 +85,7 @@ class MessageRepositoryStub implements MessageRepositoryInterface
     public function getRequiresTranslating(string $locale, string $domain): array
     {
         return array_filter($this->getEnabled($locale, $domain), function (MessageItem $item) {
-            return $item->needsChecking;
+            return $item->requiresTranslating;
         });
     }
 }

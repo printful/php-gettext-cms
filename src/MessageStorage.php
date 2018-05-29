@@ -2,6 +2,7 @@
 
 namespace Printful\GettextCms;
 
+use Gettext\Languages\Language;
 use Gettext\Translation;
 use Gettext\Translations;
 use Printful\GettextCms\Exceptions\InvalidTranslationException;
@@ -15,6 +16,12 @@ class MessageStorage
 {
     /** @var MessageRepositoryInterface */
     private $repository;
+
+    /**
+     * Cache for plural form counts
+     * @var array [locale => plural count, ..]
+     */
+    private $pluralFormCache = [];
 
     public function __construct(MessageRepositoryInterface $repository)
     {
@@ -70,13 +77,51 @@ class MessageStorage
         }
 
         $item->hasOriginalTranslation = $translation->hasTranslation();
-        $item->needsChecking = !$translation->hasTranslation();
-
-        if ($translation->hasPlural() && !$translation->hasPluralTranslations()) {
-            $item->needsChecking = true;
-        }
+        $item->requiresTranslating = $this->requiresTranslating($locale, $translation);
 
         $this->repository->save($item);
+    }
+
+    /**
+     * Check if some translations are missing (original or missing plural forms)
+     *
+     * @param string $locale
+     * @param Translation $translation
+     * @return bool
+     */
+    private function requiresTranslating(string $locale, Translation $translation): bool
+    {
+        if (!$translation->hasTranslation()) {
+            return true;
+        }
+
+        if ($translation->hasPlural()) {
+            $translatedPluralCount = count(array_filter($translation->getPluralTranslations()));
+            // If there are less plural translations than language requires, this needs translating
+            return $this->getPluralCount($locale) !== $translatedPluralCount;
+        }
+
+        return false;
+    }
+
+    /**
+     * Get number of plural forms for this locale
+     *
+     * @param string $locale
+     * @return int
+     */
+    private function getPluralCount(string $locale): int
+    {
+        if (!array_key_exists($locale, $this->pluralFormCache)) {
+            $info = Language::getById($locale);
+            if ($info) {
+                $this->pluralFormCache[$locale] = count($info->categories);
+            } else {
+                $this->pluralFormCache[$locale] = 2; // Graceful fallback to two forms - zero and multiple
+            }
+        }
+
+        return $this->pluralFormCache[$locale];
     }
 
     /**

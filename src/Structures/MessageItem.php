@@ -45,7 +45,10 @@ class MessageItem
     public $isDisabled = false;
 
     /**
-     * This indicates if original is translated, but plural translations can be missing
+     * This indicates if original is translated, but plural translations can be missing.
+     * This means that we still can use this translation for gettext (message should be exported),
+     * just plurals won't have a translation.
+     *
      * @var bool
      */
     public $hasOriginalTranslation = false;
@@ -54,7 +57,7 @@ class MessageItem
      * This indicates if string has to be translated/checked, can be missing plural translation
      * @var bool
      */
-    public $needsChecking = false;
+    public $requiresTranslating = false;
 
     /**
      * @var string

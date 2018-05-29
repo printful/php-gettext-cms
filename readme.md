@@ -29,3 +29,5 @@
     
 * When saving a translation file from upload, do not disable existing translation files
 * When extracting translations from code, then disable all existing translation prior to saving so we filter out unneeded translations
+
+* Gettext revisions, custom functions for using the revision file (like gulp)
