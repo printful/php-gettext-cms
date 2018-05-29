@@ -3,7 +3,7 @@
 /** @noinspection SpellCheckingInspection */
 
 
-namespace Printful\GettextCms\Tests\Storage;
+namespace Printful\GettextCms\Tests\TestCases;
 
 
 use Gettext\Translations;

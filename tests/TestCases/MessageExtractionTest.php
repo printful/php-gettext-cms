@@ -2,7 +2,7 @@
 /** @noinspection PhpUnhandledExceptionInspection */
 
 
-namespace Printful\GettextCms\Tests\Extractor;
+namespace Printful\GettextCms\Tests\TestCases;
 
 
 use Gettext\Translation;

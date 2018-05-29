@@ -45,6 +45,13 @@ class MessageStorage
         }
     }
 
+    /**
+     * Save a translation to database by merging it to a previously saved version.
+     *
+     * @param string $locale
+     * @param string $domain
+     * @param Translation $translation
+     */
     public function saveSingleTranslation(string $locale, string $domain, Translation $translation)
     {
         $key = $this->getKey($locale, $domain, $translation);
@@ -85,6 +92,12 @@ class MessageStorage
         return md5($locale . '|' . $domain . '|' . $translation->getContext() . '|' . $translation->getOriginal());
     }
 
+    /**
+     * Convert a message item to a translation item
+     *
+     * @param MessageItem $item
+     * @return Translation
+     */
     private function itemToTranslation(MessageItem $item): Translation
     {
         $translation = new Translation($item->context, $item->original, $item->originalPlural);
@@ -108,6 +121,14 @@ class MessageStorage
         return $translation;
     }
 
+    /**
+     * Convert a translation item to a message item
+     *
+     * @param string $locale
+     * @param string $domain
+     * @param Translation $translation
+     * @return MessageItem
+     */
     private function translationToItem(string $locale, string $domain, Translation $translation): MessageItem
     {
         $item = new MessageItem;
@@ -137,7 +158,11 @@ class MessageStorage
      */
     public function getAll(string $locale, $domain): Translations
     {
-        return $this->getTranslations($locale, $domain, false, false);
+        return $this->convertItems(
+            $locale,
+            (string)$domain,
+            $this->repository->getAll($locale, (string)$domain)
+        );
     }
 
     /**
@@ -149,7 +174,11 @@ class MessageStorage
      */
     public function getAllEnabled(string $locale, $domain): Translations
     {
-        return $this->getTranslations($locale, $domain, true, false);
+        return $this->convertItems(
+            $locale,
+            (string)$domain,
+            $this->repository->getEnabled($locale, (string)$domain)
+        );
     }
 
     /**
@@ -161,24 +190,44 @@ class MessageStorage
      */
     public function getEnabledTranslated(string $locale, $domain): Translations
     {
-        return $this->getTranslations($locale, $domain, true, true);
+        return $this->convertItems(
+            $locale,
+            (string)$domain,
+            $this->repository->getEnabledTranslated($locale, (string)$domain)
+        );
     }
 
-    private function getTranslations(string $locale, $domain, bool $enabledOnly, bool $translatedOnly): Translations
+    /**
+     * Enabled and translated translations only
+     *
+     * @param string $locale
+     * @param $domain
+     * @return Translations
+     */
+    public function getRequiresTranslating(string $locale, $domain): Translations
+    {
+        return $this->convertItems(
+            $locale,
+            (string)$domain,
+            $this->repository->getRequiresTranslating($locale, (string)$domain)
+        );
+    }
+
+    /**
+     * Converts message items to a translation object
+     *
+     * @param string $locale
+     * @param string|null $domain
+     * @param MessageItem[] $items
+     * @return Translations
+     */
+    private function convertItems(string $locale, $domain, array $items): Translations
     {
         $domain = (string)$domain;
 
         $translations = new Translations;
         $translations->setDomain($domain);
         $translations->setLanguage($locale);
-
-        if ($enabledOnly && $translatedOnly) {
-            $items = $this->repository->getEnabledTranslated($locale, $domain);
-        } elseif ($enabledOnly) {
-            $items = $this->repository->getEnabled($locale, $domain);
-        } else {
-            $items = $this->repository->getAll($locale, $domain);
-        }
 
         foreach ($items as $v) {
             $translation = $this->itemToTranslation($v);

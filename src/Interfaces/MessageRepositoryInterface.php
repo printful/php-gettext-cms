@@ -59,7 +59,7 @@ interface MessageRepositoryInterface
      * @param string $domain
      * @return MessageItem[]
      */
-    public function getEnabledAndNeedsChecking(string $locale, string $domain): array;
+    public function getRequiresTranslating(string $locale, string $domain): array;
 
     /**
      * Mark all messages in the given domain and locale as disabled

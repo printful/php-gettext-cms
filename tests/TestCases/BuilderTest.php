@@ -1,7 +1,7 @@
 <?php
 /** @noinspection PhpUnhandledExceptionInspection */
 
-namespace Printful\GettextCms\Tests\Builder;
+namespace Printful\GettextCms\Tests\TestCases;
 
 use Gettext\Extractors\Mo;
 use Gettext\Translations;

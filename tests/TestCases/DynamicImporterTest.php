@@ -1,6 +1,6 @@
 <?php /** @noinspection PhpUnhandledExceptionInspection */
 
-namespace Printful\GettextCms\Tests\Importer;
+namespace Printful\GettextCms\Tests\TestCases;
 
 use Mockery;
 use Mockery\Mock;

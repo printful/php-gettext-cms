@@ -1,7 +1,7 @@
 <?php
 /** @noinspection PhpUnhandledExceptionInspection */
 
-namespace Printful\GettextCms\Tests\Extractor;
+namespace Printful\GettextCms\Tests\TestCases;
 
 use Mockery;
 use Printful\GettextCms\Exceptions\InvalidPathException;
