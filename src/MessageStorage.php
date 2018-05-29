@@ -109,16 +109,13 @@ class MessageStorage
      *
      * @param string $locale
      * @return int
+     * @throws \InvalidArgumentException Thrown in the locale is not correct
      */
     private function getPluralCount(string $locale): int
     {
         if (!array_key_exists($locale, $this->pluralFormCache)) {
             $info = Language::getById($locale);
-            if ($info) {
-                $this->pluralFormCache[$locale] = count($info->categories);
-            } else {
-                $this->pluralFormCache[$locale] = 2; // Graceful fallback to two forms - zero and multiple
-            }
+            $this->pluralFormCache[$locale] = count($info->categories);
         }
 
         return $this->pluralFormCache[$locale];
