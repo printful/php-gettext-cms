@@ -1,7 +1,7 @@
 <?php
 /** @noinspection PhpUnhandledExceptionInspection */
 
-namespace Printful\GettextCms\Tests\Exporter;
+namespace Printful\GettextCms\Tests\Builder;
 
 use Gettext\Extractors\Mo;
 use Gettext\Translations;
@@ -12,12 +12,12 @@ use org\bovigo\vfs\vfsStreamDirectory;
 use Printful\GettextCms\Exceptions\InvalidPathException;
 use Printful\GettextCms\Interfaces\MessageConfigInterface;
 use Printful\GettextCms\Interfaces\MessageRepositoryInterface;
-use Printful\GettextCms\MessageExporter;
+use Printful\GettextCms\MessageBuilder;
 use Printful\GettextCms\MessageStorage;
 use Printful\GettextCms\Structures\MessageItem;
 use Printful\GettextCms\Tests\TestCase;
 
-class ExporterTest extends TestCase
+class BuilderTest extends TestCase
 {
     /** @var Mock|MessageConfigInterface */
     private $mockConfig;
@@ -25,7 +25,7 @@ class ExporterTest extends TestCase
     /** @var Mock|MessageRepositoryInterface */
     private $mockRepository;
 
-    /** @var MessageExporter */
+    /** @var MessageBuilder */
     private $exporter;
 
     /** @var vfsStreamDirectory */
@@ -39,7 +39,7 @@ class ExporterTest extends TestCase
 
         $this->mockConfig = Mockery::mock(MessageConfigInterface::class);
         $this->mockRepository = Mockery::mock(MessageRepositoryInterface::class);
-        $this->exporter = new MessageExporter($this->mockConfig, new MessageStorage($this->mockRepository));
+        $this->exporter = new MessageBuilder($this->mockConfig, new MessageStorage($this->mockRepository));
     }
 
     public function testExportToMoFile()

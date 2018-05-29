@@ -9,7 +9,7 @@ use Printful\GettextCms\Interfaces\MessageConfigInterface;
 /**
  * Class allows to export translations from repository to a generated .mo file which is used with gettext
  */
-class MessageExporter
+class MessageBuilder
 {
     /** @var MessageConfigInterface */
     private $config;

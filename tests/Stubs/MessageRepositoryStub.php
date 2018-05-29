@@ -45,10 +45,10 @@ class MessageRepositoryStub implements MessageRepositoryInterface
     /**
      * @inheritdoc
      */
-    public function getEnabledTranslated($locale, $domain): array
+    public function getEnabledTranslated(string $locale, string $domain): array
     {
         return array_filter($this->getEnabled($locale, $domain), function (MessageItem $item) {
-            return $item->isTranslated;
+            return $item->hasOriginalTranslation;
         });
     }
 
@@ -77,5 +77,15 @@ class MessageRepositoryStub implements MessageRepositoryInterface
             }
             return $item;
         }, $this->store);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getEnabledAndNeedsChecking(string $locale, string $domain): array
+    {
+        return array_filter($this->getEnabled($locale, $domain), function (MessageItem $item) {
+            return $item->needsChecking;
+        });
     }
 }

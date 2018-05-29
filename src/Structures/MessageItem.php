@@ -48,7 +48,7 @@ class MessageItem
      * This indicates if original is translated, but plural translations can be missing
      * @var bool
      */
-    public $isTranslated = false;
+    public $hasOriginalTranslation = false;
 
     /**
      * This indicates if string has to be translated/checked, can be missing plural translation

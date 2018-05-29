@@ -62,7 +62,7 @@ class MessageStorage
             $item = $this->translationToItem($locale, $domain, $translation);
         }
 
-        $item->isTranslated = $translation->hasTranslation();
+        $item->hasOriginalTranslation = $translation->hasTranslation();
         $item->needsChecking = !$translation->hasTranslation();
 
         if ($translation->hasPlural() && !$translation->hasPluralTranslations()) {
