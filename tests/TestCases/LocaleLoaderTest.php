@@ -15,6 +15,10 @@ use Printful\GettextCms\MessageStorage;
 use Printful\GettextCms\Tests\Stubs\MessageRepositoryStub;
 use Printful\GettextCms\Tests\TestCase;
 
+/**
+ * Run tests in separate process so they don't mess up environment variables for other tests
+ * @runTestsInSeparateProcesses
+ */
 class LocaleLoaderTest extends TestCase
 {
     /** @var string */
@@ -110,19 +114,18 @@ class LocaleLoaderTest extends TestCase
         $this->config->shouldReceive('getOtherDomains')->andReturn([])->atLeast()->once();
         $this->config->shouldReceive('useRevisions')->andReturn(false)->atLeast()->once();
 
-        $t1 = (new Translation('', 'Eng original'))->setTranslation('Eng translation');
+        $t1 = (new Translation('', 'Original'))->setTranslation('Eng');
         $this->storage->saveSingleTranslation($locale1, $domain, $t1);
         $this->builder->export($locale1, $domain);
 
-        $t2 = (new Translation('', 'Ger original'))->setTranslation('Ger translation');
+        $t2 = (new Translation('', 'Original'))->setTranslation('Ger');
         $this->storage->saveSingleTranslation($locale2, $domain, $t2);
         $this->builder->export($locale2, $domain);
 
-        $this->loader->load($locale1);
+        self::assertTrue($this->loader->load($locale1));
         self::assertEquals($t1->getTranslation(), _($t1->getOriginal()), 'Translation is returned');
 
-        $this->loader->load($locale2);
+        self::assertTrue($this->loader->load($locale2));
         self::assertEquals($t2->getTranslation(), _($t2->getOriginal()), 'Translation is returned');
     }
-
 }
