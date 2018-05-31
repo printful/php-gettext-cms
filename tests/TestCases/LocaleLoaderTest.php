@@ -73,14 +73,12 @@ class LocaleLoaderTest extends TestCase
 
     public function testLoadLocaleAndGetTranslationWithGettext()
     {
-        $config = $this->config;
-
         $domain = 'default';
         $locale = 'en_US';
 
-        $config->shouldReceive('getDefaultDomain')->andReturn($domain)->atLeast()->once();
-        $config->shouldReceive('getOtherDomains')->andReturn([])->atLeast()->once();
-        $config->shouldReceive('useRevisions')->andReturn(false)->atLeast()->once();
+        $this->config->shouldReceive('getDefaultDomain')->andReturn($domain)->atLeast()->once();
+        $this->config->shouldReceive('getOtherDomains')->andReturn([])->atLeast()->once();
+        $this->config->shouldReceive('useRevisions')->andReturn(false)->atLeast()->once();
 
         $this->storage->saveSingleTranslation($locale, $domain, (new Translation('', 'O1'))->setTranslation('T1'));
         $this->builder->export($locale, $domain);
@@ -101,4 +99,30 @@ class LocaleLoaderTest extends TestCase
         $this->loader->load($locale);
         self::assertEquals('T1', _('O1'), 'Translation is returned');
     }
+
+    public function testSwitchBetweenTwoLocales()
+    {
+        $domain = 'default';
+        $locale1 = 'en_US';
+        $locale2 = 'de_DE';
+
+        $this->config->shouldReceive('getDefaultDomain')->andReturn($domain)->atLeast()->once();
+        $this->config->shouldReceive('getOtherDomains')->andReturn([])->atLeast()->once();
+        $this->config->shouldReceive('useRevisions')->andReturn(false)->atLeast()->once();
+
+        $t1 = (new Translation('', 'Eng original'))->setTranslation('Eng translation');
+        $this->storage->saveSingleTranslation($locale1, $domain, $t1);
+        $this->builder->export($locale1, $domain);
+
+        $t2 = (new Translation('', 'Ger original'))->setTranslation('Ger translation');
+        $this->storage->saveSingleTranslation($locale2, $domain, $t2);
+        $this->builder->export($locale2, $domain);
+
+        $this->loader->load($locale1);
+        self::assertEquals($t1->getTranslation(), _($t1->getOriginal()), 'Translation is returned');
+
+        $this->loader->load($locale2);
+        self::assertEquals($t2->getTranslation(), _($t2->getOriginal()), 'Translation is returned');
+    }
+
 }
