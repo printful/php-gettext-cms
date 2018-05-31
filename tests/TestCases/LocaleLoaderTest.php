@@ -94,7 +94,7 @@ class LocaleLoaderTest extends TestCase
 
         self::assertEquals('T1', _('O1'), 'Translation is returned');
 
-        $this->loader->load('lv_LV');
+        $this->loader->load('de_DE');
 
         self::assertEquals('O1', _('O1'), 'Translation does not exist for other locale');
     }

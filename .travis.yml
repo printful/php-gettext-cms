@@ -6,7 +6,7 @@ php:
   - 7.2
 
 before_script:
-  - sudo apt-get update && sudo apt-get --reinstall install -qq language-pack-en language-pack-lv
+  - sudo apt-get update && sudo apt-get --reinstall install -qq language-pack-en language-pack-lv language-pack-de
   - travis_retry composer self-update
   - travis_retry composer install --prefer-source --no-interaction --dev
 

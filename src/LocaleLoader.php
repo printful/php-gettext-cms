@@ -2,6 +2,7 @@
 
 namespace Printful\GettextCms;
 
+use Printful\GettextCms\Exceptions\UnsupportedLocaleException;
 use Printful\GettextCms\Interfaces\MessageConfigInterface;
 
 /**
@@ -26,11 +27,15 @@ class LocaleLoader
      *
      * @param string $locale
      * @return bool If false is returned, some domains may not have been bound and will fail
+     * @throws UnsupportedLocaleException
      */
     public function load(string $locale): bool
     {
         putenv("LANG=" . $locale);
-        setlocale(LC_ALL, $locale);
+
+        if (!setlocale(LC_ALL, $locale)) {
+            throw new UnsupportedLocaleException('Locale is not supported: ' . $locale);
+        }
 
         return $this->bindDomains($locale);
     }
