@@ -15,7 +15,7 @@ before_script:
   - travis_retry composer self-update
   - travis_retry composer install --prefer-source --no-interaction
   - locale -a
-  - php -r "setlocale(LC_ALL, 'xx_XX');"
+  - php -r "var_dump(setlocale(LC_ALL, 'xx_XX'));"
 
 script: phpunit --coverage-clover=coverage.clover
 
