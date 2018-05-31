@@ -13,8 +13,9 @@ addons:
 
 before_script:
   - travis_retry composer self-update
-  - travis_retry composer install --prefer-source --no-interaction --dev
+  - travis_retry composer install --prefer-source --no-interaction
   - locale -a
+  - php -r "setlocale(LC_ALL, 'en_US');"
 
 script: phpunit --coverage-clover=coverage.clover
 
