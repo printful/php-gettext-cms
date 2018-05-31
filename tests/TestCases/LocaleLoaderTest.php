@@ -76,7 +76,7 @@ class LocaleLoaderTest extends TestCase
         $config = $this->config;
 
         $domain = 'default';
-        $locale = 'en_US';
+        $locale = 'en-US';
 
         $config->shouldReceive('getDefaultDomain')->andReturn($domain)->atLeast()->once();
         $config->shouldReceive('getOtherDomains')->andReturn([])->atLeast()->once();
