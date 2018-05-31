@@ -43,7 +43,7 @@ class LocaleLoader
      */
     private function bindDomains(string $locale): bool
     {
-        $domainBindingFailed = false;
+        $domainBound = true;
 
         $domainDir = rtrim($this->config->getMoDirectory(), '/');
 
@@ -58,7 +58,7 @@ class LocaleLoader
             // File structure for a translation is: mo-directory/{locale}/LC_MESSAGES/{domain}.mo
             if (!bindtextdomain($actualDomain, $domainDir)) {
                 // If text domain binding fails, something is wrong with the paths
-                $domainBindingFailed = true;
+                $domainBound = false;
             }
 
             bind_textdomain_codeset($actualDomain, 'utf8');
@@ -67,7 +67,7 @@ class LocaleLoader
         // Bind the default domain for _() calls (and other non-domain specific calls)
         textdomain($this->getActualDomain($locale, $defaultDomain));
 
-        return $domainBindingFailed;
+        return $domainBound;
     }
 
     /**

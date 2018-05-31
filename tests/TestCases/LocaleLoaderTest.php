@@ -88,7 +88,9 @@ class LocaleLoaderTest extends TestCase
 
         self::assertEquals('O1', _('O1'), 'Translation does not exist');
 
-        $this->loader->load($locale);
+        $domainBound = $this->loader->load($locale);
+
+        self::assertTrue($domainBound, 'Text domain was bound');
 
         self::assertEquals('T1', _('O1'), 'Translation is returned');
 
