@@ -33,11 +33,29 @@ class LocaleLoader
     {
         putenv("LANG=" . $locale);
 
-        if (!setlocale(LC_ALL, $locale)) {
-            throw new UnsupportedLocaleException('Locale is not supported: ' . $locale);
+        if (!$this->setLocale($locale)) {
+            throw new UnsupportedLocaleException('Locale is not supported by your system: ' . $locale);
         }
 
         return $this->bindDomains($locale);
+    }
+
+    private function setLocale($locale): bool
+    {
+        // Some locales contain utf postfix, so we should try them all
+        $locales = [
+            $locale,
+            $locale . '.utf8',
+            $locale . '.UTF-8',
+        ];
+
+        foreach ($locales as $v) {
+            if (setlocale(LC_ALL, $v)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

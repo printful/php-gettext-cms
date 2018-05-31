@@ -5,17 +5,9 @@ php:
   - 7.1
   - 7.2
 
-addons:
-    apt:
-        packages:
-            - language-pack-en
-            - language-pack-de
-
 before_script:
   - travis_retry composer self-update
   - travis_retry composer install --prefer-source --no-interaction
-  - locale -a
-  - php -r "var_dump(setlocale(LC_ALL, 'en_US'));"
 
 script: phpunit --coverage-clover=coverage.clover
 
