@@ -1,0 +1,1 @@
+This directory is for temporary generated test files. Do not remove and do not put anything inside here permanently!

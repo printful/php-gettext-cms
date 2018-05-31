@@ -42,7 +42,7 @@ class LocaleLoaderTest extends TestCase
     {
         parent::setUp();
 
-        $this->baseDir = realpath(__DIR__ . '/../temp');
+        $this->baseDir = realpath(__DIR__ . '/../assets/temp');
         $this->moDir = 'generated-translations';
         $this->dir = $this->baseDir . '/' . $this->moDir;
 
@@ -76,7 +76,7 @@ class LocaleLoaderTest extends TestCase
         $config = $this->config;
 
         $domain = 'default';
-        $locale = 'lv_LV';
+        $locale = 'en_US';
 
         $config->shouldReceive('getDefaultDomain')->andReturn($domain)->atLeast()->once();
         $config->shouldReceive('getOtherDomains')->andReturn([])->atLeast()->once();
@@ -92,7 +92,7 @@ class LocaleLoaderTest extends TestCase
 
         self::assertEquals('T1', _('O1'), 'Translation is returned');
 
-        $this->loader->load('en_US');
+        $this->loader->load('lv_LV');
 
         self::assertEquals('O1', _('O1'), 'Translation does not exist for other locale');
     }
