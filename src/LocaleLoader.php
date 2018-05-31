@@ -33,6 +33,9 @@ class LocaleLoader
     {
         putenv("LANG=" . $locale);
 
+        // Some systems use LANGUAGE variant above LANG, so we just set both of them, just in case.
+        putenv("LANGUAGE=" . $locale);
+
         if (!$this->setLocale($locale)) {
             throw new UnsupportedLocaleException('Locale is not supported by your system: ' . $locale);
         }

@@ -83,19 +83,22 @@ class LocaleLoaderTest extends TestCase
         $config->shouldReceive('useRevisions')->andReturn(false)->atLeast()->once();
 
         $this->storage->saveSingleTranslation($locale, $domain, (new Translation('', 'O1'))->setTranslation('T1'));
-
         $this->builder->export($locale, $domain);
 
         self::assertEquals('O1', _('O1'), 'Translation does not exist');
 
-        $domainBound = $this->loader->load($locale);
-
-        self::assertTrue($domainBound, 'Text domain was bound');
-
+        // Switch to a translated locale
+        $isLocaleSet = $this->loader->load($locale);
+        self::assertTrue($isLocaleSet, 'Text domain and locale was bound');
         self::assertEquals('T1', _('O1'), 'Translation is returned');
 
-        $this->loader->load('de_DE');
-
+        // Switch to a random locale that does not have a translation
+        $isLocaleSet = $this->loader->load('de_DE');
+        self::assertTrue($isLocaleSet, 'Text domain and locale was bound');
         self::assertEquals('O1', _('O1'), 'Translation does not exist for other locale');
+
+        // Switch back to an existing locale and test again
+        $this->loader->load($locale);
+        self::assertEquals('T1', _('O1'), 'Translation is returned');
     }
 }
