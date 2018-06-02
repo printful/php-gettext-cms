@@ -13,6 +13,7 @@ use Printful\GettextCms\Exceptions\InvalidPathException;
 use Printful\GettextCms\Interfaces\MessageConfigInterface;
 use Printful\GettextCms\Interfaces\MessageRepositoryInterface;
 use Printful\GettextCms\MessageBuilder;
+use Printful\GettextCms\MessageRevisions;
 use Printful\GettextCms\MessageStorage;
 use Printful\GettextCms\Structures\MessageItem;
 use Printful\GettextCms\Tests\TestCase;
@@ -38,8 +39,15 @@ class BuilderTest extends TestCase
         $this->root = vfsStream::setup('virtualMoDirectory/');
 
         $this->mockConfig = Mockery::mock(MessageConfigInterface::class);
+
+        $this->mockConfig->shouldReceive('useRevisions')->andReturn(false);
+
         $this->mockRepository = Mockery::mock(MessageRepositoryInterface::class);
-        $this->exporter = new MessageBuilder($this->mockConfig, new MessageStorage($this->mockRepository));
+        $this->exporter = new MessageBuilder(
+            $this->mockConfig,
+            new MessageStorage($this->mockRepository),
+            new MessageRevisions($this->mockConfig)
+        );
     }
 
     public function testExportToMoFile()

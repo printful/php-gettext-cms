@@ -97,7 +97,7 @@ class LocaleLoader
     }
 
     /**
-     * Get actual domain name. If revisions are enabled, this will return something like "domain_xxxxxx"
+     * Get actual domain name. If revisions are enabled, this will return something like "domain_XXXXXX"
      *
      * @param string $locale
      * @param string $domain

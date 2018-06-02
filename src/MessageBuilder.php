@@ -17,12 +17,17 @@ class MessageBuilder
     /** @var MessageStorage */
     private $storage;
 
+    /** @var MessageRevisions */
+    private $revisions;
+
     public function __construct(
         MessageConfigInterface $config,
-        MessageStorage $storage
+        MessageStorage $storage,
+        MessageRevisions $revisions
     ) {
         $this->config = $config;
         $this->storage = $storage;
+        $this->revisions = $revisions;
     }
 
     /**
@@ -31,13 +36,24 @@ class MessageBuilder
      * @return bool
      * @throws InvalidPathException
      */
-    public function export(string $locale, string $domain)
+    public function export(string $locale, string $domain): bool
     {
         $translations = $this->storage->getAll($locale, $domain);
 
-        $pathname = $this->getMoPathname($locale, $domain);
+        $revisionedDomain = null;
+        if ($this->config->useRevisions()) {
+            $revisionedDomain = $this->revisions->generateRevisionedDomain($domain, $translations);
+        }
 
-        return Mo::toFile($translations, $pathname);
+        $pathname = $this->getMoPathname($locale, $revisionedDomain ?: $domain);
+
+        $wasSaved = Mo::toFile($translations, $pathname);
+
+        if($wasSaved && $revisionedDomain){
+            $this->revisions->saveRevision($locale, $domain, $revisionedDomain);
+        }
+
+        return $wasSaved;
     }
 
     /**
@@ -46,7 +62,7 @@ class MessageBuilder
      * @return string
      * @throws InvalidPathException
      */
-    private function getMoPathname(string $locale, string $domain)
+    private function getMoPathname(string $locale, string $domain): string
     {
         return $this->ensureDirectory($locale) . '/' . $domain . '.mo';
     }
@@ -56,7 +72,7 @@ class MessageBuilder
      * @return string
      * @throws InvalidPathException
      */
-    private function ensureDirectory(string $locale)
+    private function ensureDirectory(string $locale): string
     {
         $dirPath = rtrim($this->config->getMoDirectory(), '/');
 

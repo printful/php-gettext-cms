@@ -4,13 +4,12 @@
 namespace Printful\GettextCms\Tests\TestCases;
 
 use Gettext\Translation;
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem;
 use Mockery;
 use Mockery\Mock;
 use Printful\GettextCms\Interfaces\MessageConfigInterface;
 use Printful\GettextCms\LocaleLoader;
 use Printful\GettextCms\MessageBuilder;
+use Printful\GettextCms\MessageRevisions;
 use Printful\GettextCms\MessageStorage;
 use Printful\GettextCms\Tests\Stubs\MessageRepositoryStub;
 use Printful\GettextCms\Tests\TestCase;
@@ -36,42 +35,27 @@ class LocaleLoaderTest extends TestCase
     /** @var LocaleLoader */
     private $loader;
 
-    /** @var string */
-    private $baseDir;
-
-    /** @var string */
-    private $moDir;
-
     public function setUp()
     {
         parent::setUp();
 
-        $this->baseDir = realpath(__DIR__ . '/../assets/temp');
-        $this->moDir = 'generated-translations';
-        $this->dir = $this->baseDir . '/' . $this->moDir;
+        $this->dir = realpath(__DIR__ . '/../assets/temp') . '/generated-translations';
 
         $this->config = Mockery::mock(MessageConfigInterface::class);
         $this->config->shouldReceive('getMoDirectory')->andReturn($this->dir)->atLeast()->once();
 
         $this->storage = new MessageStorage(new MessageRepositoryStub);
-        $this->builder = new MessageBuilder($this->config, $this->storage);
+        $this->builder = new MessageBuilder($this->config, $this->storage, new MessageRevisions($this->config));
         $this->loader = new LocaleLoader($this->config);
 
-        $this->cleanDirectory();
+        $this->deleteDirectory($this->dir);
 
-        @mkdir($this->dir);
-    }
-
-    private function cleanDirectory()
-    {
-        $adapter = new Local($this->baseDir);
-        $filesystem = new Filesystem($adapter);
-        $filesystem->deleteDir($this->moDir);
+        mkdir($this->dir);
     }
 
     protected function tearDown()
     {
-        $this->cleanDirectory();
+        $this->deleteDirectory($this->dir);
         parent::tearDown();
     }
 
@@ -80,7 +64,7 @@ class LocaleLoaderTest extends TestCase
         $domain = 'default';
         $locale = 'en_US';
 
-        $this->setConfing($domain, [], false);
+        $this->setConfig($domain, [], false);
 
         $this->storage->saveSingleTranslation($locale, $domain, (new Translation('', 'O1'))->setTranslation('T1'));
         $this->builder->export($locale, $domain);
@@ -108,7 +92,7 @@ class LocaleLoaderTest extends TestCase
         $locale1 = 'en_US';
         $locale2 = 'de_DE';
 
-        $this->setConfing($domain, [], false);
+        $this->setConfig($domain, [], false);
 
         $t1 = (new Translation('', 'Original'))->setTranslation('Eng');
         $this->storage->saveSingleTranslation($locale1, $domain, $t1);
@@ -130,7 +114,7 @@ class LocaleLoaderTest extends TestCase
         $domain = 'domain3';
         $locale = 'en_US';
 
-        $this->setConfing($domain);
+        $this->setConfig($domain);
 
         $t = (new Translation('', 'Original'))->setTranslation('Translated');
         $this->storage->saveSingleTranslation($locale, $domain, $t);
@@ -153,11 +137,10 @@ class LocaleLoaderTest extends TestCase
             'Old translation is returned, not the updated one');
     }
 
-    private function setConfing($domain, array $otherDomains = [], bool $useRevisions = false): void
+    private function setConfig($domain, array $otherDomains = [], bool $useRevisions = false)
     {
         $this->config->shouldReceive('getDefaultDomain')->andReturn($domain)->atLeast()->once();
         $this->config->shouldReceive('getOtherDomains')->andReturn($otherDomains)->atLeast()->once();
         $this->config->shouldReceive('useRevisions')->andReturn($useRevisions)->atLeast()->once();
     }
-
 }
