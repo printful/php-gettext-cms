@@ -80,9 +80,7 @@ class LocaleLoaderTest extends TestCase
         $domain = 'default';
         $locale = 'en_US';
 
-        $this->config->shouldReceive('getDefaultDomain')->andReturn($domain)->atLeast()->once();
-        $this->config->shouldReceive('getOtherDomains')->andReturn([])->atLeast()->once();
-        $this->config->shouldReceive('useRevisions')->andReturn(false)->atLeast()->once();
+        $this->setConfing($domain, [], false);
 
         $this->storage->saveSingleTranslation($locale, $domain, (new Translation('', 'O1'))->setTranslation('T1'));
         $this->builder->export($locale, $domain);
@@ -110,9 +108,7 @@ class LocaleLoaderTest extends TestCase
         $locale1 = 'en_US';
         $locale2 = 'de_DE';
 
-        $this->config->shouldReceive('getDefaultDomain')->andReturn($domain)->atLeast()->once();
-        $this->config->shouldReceive('getOtherDomains')->andReturn([])->atLeast()->once();
-        $this->config->shouldReceive('useRevisions')->andReturn(false)->atLeast()->once();
+        $this->setConfing($domain, [], false);
 
         $t1 = (new Translation('', 'Original'))->setTranslation('Eng');
         $this->storage->saveSingleTranslation($locale1, $domain, $t1);
@@ -128,4 +124,40 @@ class LocaleLoaderTest extends TestCase
         self::assertTrue($this->loader->load($locale2));
         self::assertEquals($t2->getTranslation(), _($t2->getOriginal()), 'Translation is returned');
     }
+
+    public function testGettextCachesOldTranslationWithoutRevisions()
+    {
+        $domain = 'domain3';
+        $locale = 'en_US';
+
+        $this->setConfing($domain);
+
+        $t = (new Translation('', 'Original'))->setTranslation('Translated');
+        $this->storage->saveSingleTranslation($locale, $domain, $t);
+        $this->builder->export($locale, $domain);
+
+        $this->loader->load($locale);
+
+        self::assertEquals($t->getTranslation(), _($t->getOriginal()), 'Translation is returned');
+
+        $tUpdated = (new Translation('', 'Original'))->setTranslation('Updated translation');
+        $this->storage->saveSingleTranslation($locale, $domain, $tUpdated);
+        $this->builder->export($locale, $domain);
+
+        $this->loader->load($locale);
+
+        // Proves that without revisions, gettext caches the first translated string, ignores updated
+        self::assertEquals(
+            $t->getTranslation(),
+            _($tUpdated->getOriginal()),
+            'Old translation is returned, not the updated one');
+    }
+
+    private function setConfing($domain, array $otherDomains = [], bool $useRevisions = false): void
+    {
+        $this->config->shouldReceive('getDefaultDomain')->andReturn($domain)->atLeast()->once();
+        $this->config->shouldReceive('getOtherDomains')->andReturn($otherDomains)->atLeast()->once();
+        $this->config->shouldReceive('useRevisions')->andReturn($useRevisions)->atLeast()->once();
+    }
+
 }
