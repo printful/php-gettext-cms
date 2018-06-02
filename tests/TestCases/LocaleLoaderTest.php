@@ -16,8 +16,8 @@ use Printful\GettextCms\Tests\Stubs\MessageRepositoryStub;
 use Printful\GettextCms\Tests\TestCase;
 
 /**
- * Run tests in separate process so they don't mess up environment variables for other tests
- * @runTestsInSeparateProcesses
+ * Warning, each test has to use a different text domain, because all tests run in the separate process
+ * and gettext may not re-cache the translations.
  */
 class LocaleLoaderTest extends TestCase
 {
@@ -106,7 +106,7 @@ class LocaleLoaderTest extends TestCase
 
     public function testSwitchBetweenTwoLocales()
     {
-        $domain = 'default';
+        $domain = 'domain2';
         $locale1 = 'en_US';
         $locale2 = 'de_DE';
 
