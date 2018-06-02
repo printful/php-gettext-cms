@@ -120,7 +120,7 @@ class LocaleLoaderTest extends TestCase
 
         $this->setConfig($domain);
 
-        $t = (new Translation('', 'Original'))->setTranslation('Translated');
+        $t = (new Translation('', 'Domain 3 Original'))->setTranslation('Translated');
         $this->storage->saveSingleTranslation($locale, $domain, $t);
         $this->builder->export($locale, $domain);
 
@@ -128,7 +128,7 @@ class LocaleLoaderTest extends TestCase
 
         self::assertEquals($t->getTranslation(), _($t->getOriginal()), 'Translation is returned');
 
-        $tUpdated = (new Translation('', 'Original'))->setTranslation('Updated translation');
+        $tUpdated = (new Translation('', 'Domain 3 Original'))->setTranslation('Updated translation');
         $this->storage->saveSingleTranslation($locale, $domain, $tUpdated);
         $this->builder->export($locale, $domain);
 
