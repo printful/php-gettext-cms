@@ -38,7 +38,7 @@ class MessageBuilder
      */
     public function export(string $locale, string $domain): bool
     {
-        $translations = $this->storage->getAll($locale, $domain);
+        $translations = $this->storage->getEnabledTranslated($locale, $domain);
 
         $revisionedDomain = null;
         if ($this->config->useRevisions()) {

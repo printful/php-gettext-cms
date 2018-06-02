@@ -16,10 +16,10 @@ class LocaleLoader
     /** @var MessageRevisions */
     private $revisions;
 
-    public function __construct(MessageConfigInterface $config)
+    public function __construct(MessageConfigInterface $config, MessageRevisions $revisions)
     {
-        $this->revisions = new MessageRevisions($config);
         $this->config = $config;
+        $this->revisions = $revisions;
     }
 
     /**

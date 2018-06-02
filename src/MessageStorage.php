@@ -61,14 +61,17 @@ class MessageStorage
      */
     public function saveSingleTranslation(string $locale, string $domain, Translation $translation)
     {
+        // Make a clone so we don't modify the passed instance
+        $translation = $translation->getClone();
+
         $key = $this->getKey($locale, $domain, $translation);
 
         $existingItem = $this->repository->getSingle($key);
 
         if ($existingItem->exists()) {
             $existingTranslation = $this->itemToTranslation($existingItem);
-            $existingTranslation->mergeWith($translation);
-            $item = $this->translationToItem($locale, $domain, $existingTranslation);
+            $translation->mergeWith($existingTranslation);
+            $item = $this->translationToItem($locale, $domain, $translation);
 
             // Override the disabled state of the existing translation
             $item->isDisabled = $translation->isDisabled();

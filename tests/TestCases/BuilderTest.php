@@ -62,7 +62,7 @@ class BuilderTest extends TestCase
             $this->getMessageItem('O3', 'T3', 'CTX3'),
         ];
 
-        $this->mockRepository->shouldReceive('getAll')->with($locale, $domain)->andReturn($messages)->once();
+        $this->mockRepository->shouldReceive('getEnabledTranslated')->with($locale, $domain)->andReturn($messages)->once();
 
         $dir = $this->root->url();
 
@@ -81,7 +81,7 @@ class BuilderTest extends TestCase
 
     public function testExceptionOnMissingDir()
     {
-        $this->mockRepository->shouldReceive('getAll')->andReturn([
+        $this->mockRepository->shouldReceive('getEnabledTranslated')->andReturn([
             $this->getMessageItem('Original', 'Translation', ''),
         ])->once();
 

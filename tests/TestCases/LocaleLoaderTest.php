@@ -35,6 +35,9 @@ class LocaleLoaderTest extends TestCase
     /** @var LocaleLoader */
     private $loader;
 
+    /** @var MessageRevisions */
+    private $revisions;
+
     public function setUp()
     {
         parent::setUp();
@@ -45,8 +48,9 @@ class LocaleLoaderTest extends TestCase
         $this->config->shouldReceive('getMoDirectory')->andReturn($this->dir)->atLeast()->once();
 
         $this->storage = new MessageStorage(new MessageRepositoryStub);
-        $this->builder = new MessageBuilder($this->config, $this->storage, new MessageRevisions($this->config));
-        $this->loader = new LocaleLoader($this->config);
+        $this->revisions = new MessageRevisions($this->config);
+        $this->builder = new MessageBuilder($this->config, $this->storage, $this->revisions);
+        $this->loader = new LocaleLoader($this->config, $this->revisions);
 
         $this->deleteDirectory($this->dir);
 
@@ -135,6 +139,56 @@ class LocaleLoaderTest extends TestCase
             $t->getTranslation(),
             _($tUpdated->getOriginal()),
             'Old translation is returned, not the updated one');
+    }
+
+    public function testGettextCacheBustingWithDomainRevisions()
+    {
+        $locale = 'en_US';
+        $domainMain = 'domain-main';
+        $domainOther = 'domain-other';
+
+        $this->setConfig($domainMain, [$domainOther], true);
+
+        $this->addAndExport($locale, $domainMain, 'Original', 'Translated');
+        $this->addAndExport($locale, $domainOther, 'Other Original', 'Other Translated');
+
+        $this->loader->load($locale);
+
+        self::assertEquals('Translated', gettext('Original'), 'Main translated');
+
+        $otherRevisionedDomain = $this->revisions->getRevisionedDomain($locale, $domainOther);
+
+        self::assertEquals(
+            'Other Translated',
+            dgettext($otherRevisionedDomain, 'Other Original'),
+            'Other domain was translated'
+        );
+
+
+        $this->addAndExport($locale, $domainMain, 'Original', 'Translated v2');
+        $this->addAndExport($locale, $domainOther, 'Other Original', 'Other Translated v2');
+
+        // Re-load so changes take effect
+        $this->loader->load($locale);
+
+        $otherRevisionedDomainModified = $this->revisions->getRevisionedDomain($locale, $domainOther);
+
+        self::assertNotEquals($otherRevisionedDomain, $otherRevisionedDomainModified, 'Revision changed');
+
+        self::assertEquals('Translated v2', gettext('Original'), 'Main translated after revision');
+
+        self::assertEquals(
+            'Other Translated v2',
+            dgettext($otherRevisionedDomainModified, 'Other Original'),
+            'Other translated after revision'
+        );
+    }
+
+    private function addAndExport($locale, $domain, $original, $translation)
+    {
+        $t = (new Translation('', $original))->setTranslation($translation);
+        $this->storage->saveSingleTranslation($locale, $domain, $t);
+        $this->builder->export($locale, $domain);
     }
 
     private function setConfig($domain, array $otherDomains = [], bool $useRevisions = false)
