@@ -45,11 +45,11 @@ class MessageBuilder
             $revisionedDomain = $this->revisions->generateRevisionedDomain($domain, $translations);
         }
 
-        $pathname = $this->getMoPathname($locale, $revisionedDomain ?: $domain);
+        $moPathname = $this->ensureDirectoryAndGetMoPathname($locale, $revisionedDomain ?: $domain);
 
-        $wasSaved = Mo::toFile($translations, $pathname);
+        $wasSaved = Mo::toFile($translations, $moPathname);
 
-        if($wasSaved && $revisionedDomain){
+        if ($wasSaved && $revisionedDomain) {
             $this->revisions->saveRevision($locale, $domain, $revisionedDomain);
         }
 
@@ -62,30 +62,35 @@ class MessageBuilder
      * @return string
      * @throws InvalidPathException
      */
-    private function getMoPathname(string $locale, string $domain): string
+    private function ensureDirectoryAndGetMoPathname(string $locale, string $domain): string
     {
-        return $this->ensureDirectory($locale) . '/' . $domain . '.mo';
+        $baseDir = $this->config->getMoDirectory();
+        $pathname = self::getMoPathname($baseDir, $locale, $domain);
+
+        if (!is_dir($baseDir)) {
+            throw new InvalidPathException("Directory '$baseDir' does not exist");
+        }
+
+        $localeDir = dirname($pathname);
+
+        if (!is_dir($localeDir)) {
+            // Create the {baseDir}/{locale}/LC_MESSAGES directory
+            mkdir($localeDir, 0777, true);
+        }
+
+        return $pathname;
     }
 
     /**
+     * Get full pathname to mo file
+     *
+     * @param string $moDirectory Base directory path for mo files
      * @param string $locale
-     * @return string
-     * @throws InvalidPathException
+     * @param string $domain
+     * @return string Full pathname to mo file
      */
-    private function ensureDirectory(string $locale): string
+    public static function getMoPathname($moDirectory, $locale, $domain): string
     {
-        $dirPath = rtrim($this->config->getMoDirectory(), '/');
-
-        if (!is_dir($dirPath)) {
-            throw new InvalidPathException("Directory '$dirPath' does not exist");
-        }
-
-        $path = $dirPath . '/' . $locale . '/LC_MESSAGES';
-
-        if (!is_dir($path)) {
-            mkdir($path, 0777, true);
-        }
-
-        return $path;
+        return rtrim($moDirectory, '/') . '/' . $locale . '/LC_MESSAGES/' . $domain . '.mo';
     }
 }
