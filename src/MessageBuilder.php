@@ -80,7 +80,7 @@ class MessageBuilder
             return true;
         }
 
-        $previousPathname = self::getMoPathname($locale, $previousDomain);
+        $previousPathname = $this->getMoPathname($locale, $previousDomain);
 
         if (is_file($previousPathname)) {
             return @unlink($previousPathname);
