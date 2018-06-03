@@ -4,6 +4,7 @@
 namespace Printful\GettextCms\Tests\TestCases;
 
 use Gettext\Extractors\Mo;
+use Gettext\Translation;
 use Gettext\Translations;
 use Mockery;
 use Mockery\Mock;
@@ -15,7 +16,7 @@ use Printful\GettextCms\Interfaces\MessageRepositoryInterface;
 use Printful\GettextCms\MessageBuilder;
 use Printful\GettextCms\MessageRevisions;
 use Printful\GettextCms\MessageStorage;
-use Printful\GettextCms\Structures\MessageItem;
+use Printful\GettextCms\Tests\Stubs\MessageRepositoryStub;
 use Printful\GettextCms\Tests\TestCase;
 
 class BuilderTest extends TestCase
@@ -23,8 +24,8 @@ class BuilderTest extends TestCase
     /** @var Mock|MessageConfigInterface */
     private $mockConfig;
 
-    /** @var Mock|MessageRepositoryInterface */
-    private $mockRepository;
+    /** @var MessageRepositoryInterface */
+    private $repository;
 
     /** @var MessageBuilder */
     private $exporter;
@@ -32,41 +33,54 @@ class BuilderTest extends TestCase
     /** @var vfsStreamDirectory */
     private $root;
 
+    /** @var MessageRevisions */
+    private $revisions;
+
+    /** @var MessageStorage */
+    private $storage;
+
+    /** @var string */
+    private $locale;
+
+    /** @var string */
+    private $domain;
+
     protected function setUp()
     {
         parent::setUp();
+
+        $this->locale = 'en_US';
+        $this->domain = 'domain';
 
         $this->root = vfsStream::setup('virtualMoDirectory/');
 
         $this->mockConfig = Mockery::mock(MessageConfigInterface::class);
 
-        $this->mockConfig->shouldReceive('useRevisions')->andReturn(false);
+        $this->mockConfig->shouldReceive('useRevisions')->andReturn(false)->byDefault();
 
-        $this->mockRepository = Mockery::mock(MessageRepositoryInterface::class);
+        $this->repository = new MessageRepositoryStub;
+        $this->revisions = new MessageRevisions($this->mockConfig);
+        $this->storage = new MessageStorage($this->repository);
+
         $this->exporter = new MessageBuilder(
             $this->mockConfig,
-            new MessageStorage($this->mockRepository),
-            new MessageRevisions($this->mockConfig)
+            $this->storage,
+            $this->revisions
         );
     }
 
     public function testExportToMoFile()
     {
-        $locale = 'lv_LV';
+        $locale = $this->locale;
         $domain = 'custom-domain';
 
-        /** @var MessageItem[] $messages */
-        $messages = [
-            $this->getMessageItem('O1', 'T1', ''),
-            $this->getMessageItem('O2', 'T2', ''),
-            $this->getMessageItem('O3', 'T3', 'CTX3'),
-        ];
-
-        $this->mockRepository->shouldReceive('getEnabledTranslated')->with($locale, $domain)->andReturn($messages)->once();
+        $this->add('O1', 'T1');
+        $this->add('O2', 'T2');
+        $this->add('O3', 'T3', 'CTX3');
 
         $dir = $this->root->url();
 
-        $expectedPath = $locale . '/LC_MESSAGES/' . $domain . '.mo';
+        $expectedPath = $this->getMoPathname($domain);
 
         self::assertFalse($this->root->hasChild($expectedPath), 'Mo files does not exist');
 
@@ -76,19 +90,63 @@ class BuilderTest extends TestCase
 
         self::assertTrue($this->root->hasChild($expectedPath), 'Mo file was created');
 
+        $messages = $this->repository->getEnabledTranslated($locale, $domain);
         $this->verifyTranslations($messages, $locale, $domain, $this->root->url() . '/' . $expectedPath);
     }
 
     public function testExceptionOnMissingDir()
     {
-        $this->mockRepository->shouldReceive('getEnabledTranslated')->andReturn([
-            $this->getMessageItem('Original', 'Translation', ''),
-        ])->once();
+        $this->add('Original', 'Translation');
 
         $this->mockConfig->shouldReceive('getMoDirectory')->andReturn('missing-directory')->once();
 
         self::expectException(InvalidPathException::class);
-        $this->exporter->export('en_US', 'domain');
+
+        $this->exporter->export($this->locale, $this->domain);
+    }
+
+    public function testRepeatedExportOfSameTranslationResultsInSameRevision()
+    {
+        $dir = $this->root->url();
+
+        $this->mockConfig->shouldReceive('getMoDirectory')->andReturn($dir)->once();
+        $this->mockConfig->shouldReceive('useRevisions')->andReturn(true)->byDefault();
+
+        $this->add('Original', 'Translation');
+
+        $this->exporter->export($this->locale, $this->domain);
+
+        $expectedPath = $this->getMoPathname($this->revisions->getRevisionedDomain($this->locale, $this->domain));
+
+        self::assertTrue($this->root->hasChild($expectedPath), 'Mo file exists');
+
+        // Revision should not change
+        $this->exporter->export($this->locale, $this->domain);
+        self::assertTrue($this->root->hasChild($expectedPath), 'Same mo file exists');
+    }
+
+    public function testPreviousDomainIsRemovedAfterNewRevisionIsCreated()
+    {
+        $dir = $this->root->url();
+
+        $this->mockConfig->shouldReceive('getMoDirectory')->andReturn($dir)->once();
+        $this->mockConfig->shouldReceive('useRevisions')->andReturn(true)->byDefault();
+
+        $this->add('Original', 'Translation');
+
+        $this->exporter->export($this->locale, $this->domain);
+
+        $pathFirstRevision = $this->getMoPathname($this->revisions->getRevisionedDomain($this->locale, $this->domain));
+
+        self::assertTrue($this->root->hasChild($pathFirstRevision), 'Mo file exists');
+
+        $this->add('Original', 'Different Translation');
+
+        $this->exporter->export($this->locale, $this->domain);
+        $pathSecondRevision = $this->getMoPathname($this->revisions->getRevisionedDomain($this->locale, $this->domain));
+
+        self::assertFalse($this->root->hasChild($pathFirstRevision), 'Previous file is removed');
+        self::assertTrue($this->root->hasChild($pathSecondRevision), 'New revision file was created');
     }
 
     private function verifyTranslations(array $messages, string $locale, string $domain, string $moPathname)
@@ -109,14 +167,19 @@ class BuilderTest extends TestCase
         }
     }
 
-    private function getMessageItem($original, $translation, $context): MessageItem
+    private function getMoPathname($domain)
     {
-        $i = new MessageItem;
+        return $this->locale . '/LC_MESSAGES/' . $domain . '.mo';
+    }
 
-        $i->original = $original;
-        $i->translation = $translation;
-        $i->context = $context;
+    private function add(string $original, string $translation, string $context = ''): self
+    {
+        $this->storage->saveSingleTranslation(
+            $this->locale,
+            $this->domain,
+            (new Translation($context, $original))->setTranslation($translation)
+        );
 
-        return $i;
+        return $this;
     }
 }

@@ -6,6 +6,7 @@ namespace Printful\GettextCms\Tests\TestCases;
 use Gettext\Translation;
 use Mockery;
 use Mockery\Mock;
+use Printful\GettextCms\Exceptions\UnsupportedLocaleException;
 use Printful\GettextCms\Interfaces\MessageConfigInterface;
 use Printful\GettextCms\LocaleLoader;
 use Printful\GettextCms\MessageBuilder;
@@ -185,6 +186,19 @@ class LocaleLoaderTest extends TestCase
         self::assertEquals($domainMain, $this->getRevDomain($locale, $domainMain), 'Main Domain is not revisioned');
         self::assertEquals('T3 Updated', dgettext($revDomain, 'T3 Orig Other'), 'Translation updated correctly');
         self::assertEquals('T3 Trans Main', _('T3 Orig Main'), 'Main translation still correct');
+    }
+
+    public function testFailOnUnknownLocale()
+    {
+        self::expectException(UnsupportedLocaleException::class);
+        $this->loader->load('xx_XX');
+    }
+
+    public function testFailDomainBindingOnMissingFolders()
+    {
+        $this->deleteDirectory($this->dir);
+        $this->setConfig('random-domain', [], false);
+        self::assertFalse($this->loader->load('en_US'), 'Binding fails because dir does not exist');
     }
 
     private function getRevDomain($locale, $domain): string

@@ -91,8 +91,6 @@ class MessageRevisions
 
         $revisions->setRevisionedDomain($locale, $originalDomain, $revisionedDomain);
 
-        // TODO delete old generated domain revision
-
         return $this->writeToFile($revisions);
     }
 

@@ -36,7 +36,9 @@ class MessageRepositoryStub implements MessageRepositoryInterface
      */
     public function getEnabled(string $locale, string $domain): array
     {
-        return array_filter($this->getAll($locale, $domain), function (MessageItem $item) {
+        $allItems = $this->getAll($locale, $domain);
+
+        return array_filter($allItems, function (MessageItem $item) {
             return !$item->isDisabled;
         });
 
@@ -47,7 +49,9 @@ class MessageRepositoryStub implements MessageRepositoryInterface
      */
     public function getEnabledTranslated(string $locale, string $domain): array
     {
-        return array_filter($this->getEnabled($locale, $domain), function (MessageItem $item) {
+        $enabledItems = $this->getEnabled($locale, $domain);
+
+        return array_filter($enabledItems, function (MessageItem $item) {
             return $item->hasOriginalTranslation;
         });
     }

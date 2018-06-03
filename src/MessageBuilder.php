@@ -50,10 +50,43 @@ class MessageBuilder
         $wasSaved = Mo::toFile($translations, $moPathname);
 
         if ($wasSaved && $revisionedDomain) {
-            $this->revisions->saveRevision($locale, $domain, $revisionedDomain);
+            $previousRevisionedDomain = $this->revisions->getRevisionedDomain($locale, $domain);
+
+            $wasRevisionSaved = $this->revisions->saveRevision($locale, $domain, $revisionedDomain);
+
+            if ($wasRevisionSaved) {
+                $this->removePreviousRevisionedDomain($locale, $revisionedDomain, $previousRevisionedDomain);
+            }
         }
 
         return $wasSaved;
+    }
+
+    /**
+     * Remove previous domain file
+     *
+     * @param string $locale
+     * @param string $currentDomain
+     * @param string $previousDomain
+     * @return bool True if cleanup was successful
+     */
+    private function removePreviousRevisionedDomain(
+        string $locale,
+        string $currentDomain,
+        string $previousDomain
+    ): bool {
+        if ($currentDomain === $previousDomain) {
+            // Same revisioned domain, no need to remove
+            return true;
+        }
+
+        $previousPathname = self::getMoPathname($locale, $previousDomain);
+
+        if (is_file($previousPathname)) {
+            return @unlink($previousPathname);
+        }
+
+        return false;
     }
 
     /**
@@ -64,8 +97,8 @@ class MessageBuilder
      */
     private function ensureDirectoryAndGetMoPathname(string $locale, string $domain): string
     {
-        $baseDir = $this->config->getMoDirectory();
-        $pathname = self::getMoPathname($baseDir, $locale, $domain);
+        $baseDir = rtrim($this->config->getMoDirectory(), '/');
+        $pathname = $this->getMoPathname($locale, $domain);
 
         if (!is_dir($baseDir)) {
             throw new InvalidPathException("Directory '$baseDir' does not exist");
@@ -84,13 +117,12 @@ class MessageBuilder
     /**
      * Get full pathname to mo file
      *
-     * @param string $moDirectory Base directory path for mo files
      * @param string $locale
      * @param string $domain
      * @return string Full pathname to mo file
      */
-    public static function getMoPathname($moDirectory, $locale, $domain): string
+    private function getMoPathname($locale, $domain): string
     {
-        return rtrim($moDirectory, '/') . '/' . $locale . '/LC_MESSAGES/' . $domain . '.mo';
+        return rtrim($this->config->getMoDirectory(), '/') . '/' . $locale . '/LC_MESSAGES/' . $domain . '.mo';
     }
 }

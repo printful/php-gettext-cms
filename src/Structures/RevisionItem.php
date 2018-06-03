@@ -33,10 +33,7 @@ class RevisionItem
      */
     public function setRevisionedDomain(string $locale, string $originalDomain, string $revisionedDomain)
     {
-        $this->revisions += [
-            $locale => [],
-        ];
-
+        $this->revisions += [$locale => []];
         $this->revisions[$locale][$originalDomain] = $revisionedDomain;
     }
 

@@ -235,11 +235,9 @@ class MessageStorage
      */
     public function getEnabledTranslated(string $locale, $domain): Translations
     {
-        return $this->convertItems(
-            $locale,
-            (string)$domain,
-            $this->repository->getEnabledTranslated($locale, (string)$domain)
-        );
+        $items = $this->repository->getEnabledTranslated($locale, (string)$domain);
+
+        return $this->convertItems($locale, (string)$domain, $items);
     }
 
     /**
