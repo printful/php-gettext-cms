@@ -156,6 +156,42 @@ class LocaleLoaderTest extends TestCase
         );
     }
 
+    public function testEnableRevisionsAfterSomeDomainsExistUnRevisioned()
+    {
+        $domainMain = 'domain-main2';
+        $domainOther = 'domain-other2';
+        $locale = 'en_US';
+
+        $this->setConfig($domainMain, [$domainOther], false);
+
+        $this->addAndExport($locale, $domainMain, 'T3 Orig Main', 'T3 Trans Main');
+        $this->addAndExport($locale, $domainOther, 'T3 Orig Other', 'T3 Trans Other');
+        $this->loader->load($locale);
+
+        self::assertEquals($domainMain, $this->getRevDomain($locale, $domainMain), 'Domain is not revisioned');
+
+        $this->setConfig($domainMain, [$domainOther], true);
+
+        self::assertEquals($domainMain, $this->getRevDomain($locale, $domainMain), 'Domain still is not revisioned');
+
+        self::assertEquals('T3 Trans Main', _('T3 Orig Main'), 'Translations is correct');
+
+        $this->addAndExport($locale, $domainOther, 'T3 Orig Other', 'T3 Updated');
+        $this->loader->load($locale);
+
+        $revDomain = $this->getRevDomain($locale, $domainOther);
+
+        self::assertNotEquals($domainOther, $revDomain, 'Other Domain is revisioned');
+        self::assertEquals($domainMain, $this->getRevDomain($locale, $domainMain), 'Main Domain is not revisioned');
+        self::assertEquals('T3 Updated', dgettext($revDomain, 'T3 Orig Other'), 'Translation updated correctly');
+        self::assertEquals('T3 Trans Main', _('T3 Orig Main'), 'Main translation still correct');
+    }
+
+    private function getRevDomain($locale, $domain): string
+    {
+        return $this->revisions->getRevisionedDomain($locale, $domain);
+    }
+
     private function addAndExport($locale, $domain, $original, $translation)
     {
         $t = (new Translation('', $original))->setTranslation($translation);
@@ -165,8 +201,8 @@ class LocaleLoaderTest extends TestCase
 
     private function setConfig($domain, array $otherDomains = [], bool $useRevisions = false)
     {
-        $this->config->shouldReceive('getDefaultDomain')->andReturn($domain)->atLeast()->once();
-        $this->config->shouldReceive('getOtherDomains')->andReturn($otherDomains)->atLeast()->once();
-        $this->config->shouldReceive('useRevisions')->andReturn($useRevisions)->atLeast()->once();
+        $this->config->shouldReceive('getDefaultDomain')->andReturn($domain)->atLeast()->once()->byDefault();
+        $this->config->shouldReceive('getOtherDomains')->andReturn($otherDomains)->atLeast()->once()->byDefault();
+        $this->config->shouldReceive('useRevisions')->andReturn($useRevisions)->atLeast()->once()->byDefault();
     }
 }
