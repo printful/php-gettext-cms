@@ -115,30 +115,31 @@ class LocaleLoaderTest extends TestCase
 
     public function testGettextCachesOldTranslationWithoutRevisions()
     {
-        $domain = 'domain3';
+        $domainOther = 'domain-other';
         $locale = 'en_US';
 
-        $this->setConfig($domain);
+        $this->setConfig('default-domain', [$domainOther], false);
 
-        $t = (new Translation('', 'Domain 3 Original'))->setTranslation('Translated');
-        $this->storage->saveSingleTranslation($locale, $domain, $t);
-        $this->builder->export($locale, $domain);
+        $this->addAndExport($locale, $domainOther, 'Orig', 'Translated');
 
         $this->loader->load($locale);
 
-        self::assertEquals($t->getTranslation(), _($t->getOriginal()), 'Translation is returned');
+        self::assertEquals(
+            'Translated',
+            dgettext($domainOther, 'Orig'),
+            'First translation is returned correctly without revisions'
+        );
 
-        $tUpdated = (new Translation('', 'Domain 3 Original'))->setTranslation('Updated translation');
-        $this->storage->saveSingleTranslation($locale, $domain, $tUpdated);
-        $this->builder->export($locale, $domain);
+        $this->addAndExport($locale, $domainOther, 'Orig', 'Updated translation');
 
         $this->loader->load($locale);
 
         // Proves that without revisions, gettext caches the first translated string, ignores updated
         self::assertEquals(
-            $t->getTranslation(),
-            _($tUpdated->getOriginal()),
-            'Old translation is returned, not the updated one');
+            'Translated', // First translation, not the updated one
+            dgettext($domainOther, 'Orig'),
+            'Old translation is returned, not the updated one'
+        );
     }
 
     public function testGettextCacheBustingWithDomainRevisions()
