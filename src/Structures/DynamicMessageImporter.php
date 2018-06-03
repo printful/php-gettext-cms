@@ -55,7 +55,7 @@ class DynamicMessageImporter
      */
     public function saveAndDisabledPrevious(string $domain)
     {
-        if (!$this->messages) {
+        if (empty($this->messages)) {
             throw new MissingMessagesException('Tried to save but no messages were given');
         }
 

@@ -154,7 +154,7 @@ class MessageExtractor
         $files = $filesystem->listFiles('', $item->recursive);
 
         // If extensions are set, filter other files out
-        if ($item->extensions) {
+        if (!empty($item->extensions)) {
             $files = array_filter($files, function ($file) use ($item) {
                 return in_array($file['extension'], $item->extensions);
             });

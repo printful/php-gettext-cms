@@ -128,7 +128,7 @@ class MessageRevisions
             throw new InvalidPathException('Directory does not exist (' . $this->config->getMoDirectory() . ')');
         }
 
-        return file_put_contents($pathname, json_encode($revisions->toArray(), JSON_PRETTY_PRINT));
+        return (bool)file_put_contents($pathname, json_encode($revisions->toArray(), JSON_PRETTY_PRINT));
     }
 
     /**
