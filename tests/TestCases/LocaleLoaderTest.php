@@ -113,35 +113,6 @@ class LocaleLoaderTest extends TestCase
         self::assertEquals($t2->getTranslation(), _($t2->getOriginal()), 'Translation is returned');
     }
 
-    public function testGettextCachesOldTranslationWithoutRevisions()
-    {
-        $domainOther = 'domain-other';
-        $locale = 'en_US';
-
-        $this->setConfig('default-domain', [$domainOther], false);
-
-        $this->addAndExport($locale, $domainOther, 'Orig', 'Translated');
-
-        $this->loader->load($locale);
-
-        self::assertEquals(
-            'Translated',
-            dgettext($domainOther, 'Orig'),
-            'First translation is returned correctly without revisions'
-        );
-
-        $this->addAndExport($locale, $domainOther, 'Orig', 'Updated translation');
-
-        $this->loader->load($locale);
-
-        // Proves that without revisions, gettext caches the first translated string, ignores updated
-        self::assertEquals(
-            'Translated', // First translation, not the updated one
-            dgettext($domainOther, 'Orig'),
-            'Old translation is returned, not the updated one'
-        );
-    }
-
     public function testGettextCacheBustingWithDomainRevisions()
     {
         $locale = 'en_US';
