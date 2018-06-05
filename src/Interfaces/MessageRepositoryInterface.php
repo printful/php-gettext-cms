@@ -24,7 +24,7 @@ interface MessageRepositoryInterface
     public function getSingle($key): MessageItem;
 
     /**
-     * Retrieve list of messages (disabled and enabled) from a specific locale and domain
+     * Retrieve list of all messages (disabled and enabled, untranslated)
      * Includes untranslated messages
      *
      * @param string $locale
@@ -34,8 +34,7 @@ interface MessageRepositoryInterface
     public function getAll(string $locale, string $domain): array;
 
     /**
-     * Retrieve list of enabled messages from a specific locale and domain
-     * Includes untranslated messages
+     * Retrieve list of enabled messages (including untranslated)
      *
      * @param string $locale
      * @param string $domain
@@ -44,13 +43,22 @@ interface MessageRepositoryInterface
     public function getEnabled(string $locale, string $domain): array;
 
     /**
-     * Retrieve list of enabled and translated messages from a specific locale and domain
+     * Retrieve list of enabled and translated messages
      *
      * @param string $locale
      * @param string $domain
      * @return MessageItem[]
      */
     public function getEnabledTranslated(string $locale, string $domain): array;
+
+    /**
+     * Retrieve list of enabled and translated messages that are in JS files
+     *
+     * @param string $locale
+     * @param string $domain
+     * @return MessageItem[]
+     */
+    public function getEnabledTranslatedJs(string $locale, string $domain): array;
 
     /**
      * List of messages that require to be translated (enabled and are marked as needs-checking)

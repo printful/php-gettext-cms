@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Printful\GettextCms\Tests;
-
 
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
@@ -24,5 +22,10 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
         $adapter = new Local($parentDir);
         $filesystem = new Filesystem($adapter);
         $filesystem->deleteDir($childDirName);
+    }
+
+    protected function getDummyFile(string $filename = 'dummy-file.php'): string
+    {
+        return __DIR__ . '/assets/dummy-directory/' . $filename;
     }
 }

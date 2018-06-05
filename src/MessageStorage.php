@@ -53,7 +53,7 @@ class MessageStorage
     }
 
     /**
-     * Save a translation to database by merging it to a previously saved version.
+     * Save a translation to repository by merging it to a previously saved version.
      *
      * @param string $locale
      * @param string $domain
@@ -191,7 +191,27 @@ class MessageStorage
         $item->extractedComments = $translation->getExtractedComments();
         $item->isDisabled = $translation->isDisabled();
 
+        foreach ($item->references as $reference) {
+            if ($this->isJsFile($reference[0] ?? '')) {
+                $item->isJs = true;
+                break;
+            }
+        }
+
         return $item;
+    }
+
+    /**
+     * Check if this is considered a JS file.
+     *
+     * @param string $filename
+     * @return bool
+     */
+    private function isJsFile(string $filename): bool
+    {
+        $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
+        return in_array($extension, ['vue', 'js'], true);
     }
 
     /**
@@ -236,6 +256,20 @@ class MessageStorage
     public function getEnabledTranslated(string $locale, $domain): Translations
     {
         $items = $this->repository->getEnabledTranslated($locale, (string)$domain);
+
+        return $this->convertItems($locale, (string)$domain, $items);
+    }
+
+    /**
+     * Enabled and translated JS translations
+     *
+     * @param string $locale
+     * @param $domain
+     * @return Translations
+     */
+    public function getEnabledTranslatedJs(string $locale, $domain): Translations
+    {
+        $items = $this->repository->getEnabledTranslatedJs($locale, (string)$domain);
 
         return $this->convertItems($locale, (string)$domain, $items);
     }

@@ -1,9 +1,7 @@
 <?php
 /** @noinspection PhpUnhandledExceptionInspection */
 
-
 namespace Printful\GettextCms\Tests\TestCases;
-
 
 use Gettext\Translation;
 use Gettext\Translations;
@@ -107,14 +105,6 @@ class MessageExtractionTest extends TestCase
         self::assertEquals(['Extracted comment'], $translation->getExtractedComments(), 'Comment was extracted');
         self::assertNotFalse($translation, 'Translation was found');
         self::assertCount(1, $translations, 'Only one translation was found for custom function');
-    }
-
-    /**
-     * @return string
-     */
-    private function getDummyFile(): string
-    {
-        return __DIR__ . '/../assets/dummy-directory/dummy-file.php';
     }
 
     private function setDefaultDomain(string $domain)

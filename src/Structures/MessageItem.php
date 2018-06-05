@@ -9,6 +9,7 @@ class MessageItem
 {
     /**
      * Unique 32 char identifier for this message, should be used as the unique key
+     *
      * @var string
      */
     public $key = '';
@@ -66,12 +67,14 @@ class MessageItem
 
     /**
      * List of plural translations
+     *
      * @var string[]
      */
     public $pluralTranslations = [];
 
     /**
      * List of pathnames where this translation exists (with line numbers)
+     *
      * @var array[] [[file, line], ..]
      */
     public $references = [];
@@ -89,6 +92,19 @@ class MessageItem
     public $extractedComments = [];
 
     /**
+     * Indicates if this is a JS translation.
+     * Sometimes we have to know which translations are present in JS files
+     * so we export them separately for client side usage.
+     *
+     * This is detected from message references (if comes from vue or js files)
+     *
+     * @var bool
+     */
+    public $isJs = false;
+
+    /**
+     * If this is an existing translation that was saved to repository
+     *
      * @return bool
      */
     public function exists(): bool

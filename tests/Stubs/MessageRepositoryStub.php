@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Printful\GettextCms\Tests\Stubs;
-
 
 use Printful\GettextCms\Interfaces\MessageRepositoryInterface;
 use Printful\GettextCms\Structures\MessageItem;
@@ -53,6 +51,18 @@ class MessageRepositoryStub implements MessageRepositoryInterface
 
         return array_filter($enabledItems, function (MessageItem $item) {
             return $item->hasOriginalTranslation;
+        });
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getEnabledTranslatedJs(string $locale, string $domain): array
+    {
+        $enabledTranslated = $this->getEnabledTranslated($locale, $domain);
+
+        return array_filter($enabledTranslated, function (MessageItem $item) {
+            return $item->isJs;
         });
     }
 
