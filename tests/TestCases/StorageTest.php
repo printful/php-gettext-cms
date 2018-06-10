@@ -1,11 +1,10 @@
-<?php /** @noinspection PhpUnhandledExceptionInspection */
-
+<?php
+/** @noinspection PhpUnhandledExceptionInspection */
 /** @noinspection SpellCheckingInspection */
-
 
 namespace Printful\GettextCms\Tests\TestCases;
 
-
+use Gettext\Translation;
 use Gettext\Translations;
 use Printful\GettextCms\Exceptions\InvalidTranslationException;
 use Printful\GettextCms\Interfaces\MessageRepositoryInterface;
@@ -137,4 +136,48 @@ class StorageTest extends TestCase
         self::expectException(InvalidTranslationException::class);
         $this->storage->saveTranslations($translations);
     }
+
+    public function testDisabledTranslationIsNotEnabledAfterSaving()
+    {
+        $domain = 'domain';
+        $locale = 'en_US';
+
+        $t = (new Translation('', 'O1', 'P1'))
+            ->setTranslation('T2')
+            ->setDisabled(true);
+
+        $this->storage->saveSingleTranslation($locale, $domain, $t);
+
+        self::assertCount(1, $this->storage->getAll($locale, $domain), 'One translation is saved');
+        self::assertEmpty($this->storage->getAllEnabled($locale, $domain), 'No enabled translations exist');
+
+        $t2 = (new Translation('', 'O1'))
+            ->setTranslation('T2 Updated')
+            ->setPluralTranslations(['TP1'])
+            ->setDisabled(false); // Enabled
+
+        $this->storage->saveTranslatedValue($locale, $domain, $t2);
+
+        $allTs = $this->storage->getAll($locale, $domain);
+        /** @var Translation $tResult */
+        $tResult = reset($allTs);
+
+        self::assertTrue($tResult->isDisabled(), 'Translation is still disabled');
+        self::assertEquals($t2->getTranslation(), $tResult->getTranslation(), 'Translation is updated');
+    }
+
+    public function testUntranslatedSavingDoesNothing()
+    {
+        $wasSaved = $this->storage->saveTranslatedValue('en_US', 'domain', new Translation('', 'O1'));
+        self::assertFalse($wasSaved, 'Nothing was saved, because not translated');
+    }
+
+    public function testNonExisingSavingDoesNothing()
+    {
+        $t = new Translation('', 'O1');
+        $t->setTranslation('T1');
+        $wasSaved = $this->storage->saveTranslatedValue('en_US', 'domain', $t);
+        self::assertFalse($wasSaved, 'Nothing was saved, because translation is unknown');
+    }
+
 }

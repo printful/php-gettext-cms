@@ -58,8 +58,9 @@ class MessageStorage
      * @param string $locale
      * @param string $domain
      * @param Translation $translation
+     * @return bool
      */
-    public function saveSingleTranslation(string $locale, string $domain, Translation $translation)
+    public function saveSingleTranslation(string $locale, string $domain, Translation $translation): bool
     {
         // Make a clone so we don't modify the passed instance
         $translation = $translation->getClone();
@@ -82,7 +83,47 @@ class MessageStorage
         $item->hasOriginalTranslation = $translation->hasTranslation();
         $item->requiresTranslating = $this->requiresTranslating($locale, $translation);
 
-        $this->repository->save($item);
+        return $this->repository->save($item);
+    }
+
+    /**
+     * Function for saving only translated values.
+     * This will not modify disabled state and will not create new entries in repository, only modifies existing
+     *
+     * @param string $locale
+     * @param string $domain
+     * @param Translation $translation
+     * @return bool
+     */
+    public function saveTranslatedValue(string $locale, string $domain, Translation $translation): bool
+    {
+        if (!$translation->hasTranslation()) {
+            return false;
+        }
+
+        $existingItem = $this->repository->getSingle($this->getKey($locale, $domain, $translation));
+
+        if (!$existingItem->exists()) {
+            return false;
+        }
+
+        $existingTranslation = $this->itemToTranslation($existingItem);
+
+        $existingTranslation->setTranslation($translation->getTranslation());
+
+        // Make sure we do not drop previous plural translations if current one does not contain one
+        $pluralTranslations = $translation->getPluralTranslations();
+        if ($pluralTranslations) {
+            $existingTranslation->setPluralTranslations($pluralTranslations);
+        }
+
+        $item = $this->translationToItem($locale, $domain, $existingTranslation);
+
+        $item->hasOriginalTranslation = true;
+        // It's still possible that plurals are missing and this translation still needs work
+        $item->requiresTranslating = $this->requiresTranslating($locale, $translation);
+
+        return $this->repository->save($item);
     }
 
     /**
