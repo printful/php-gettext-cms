@@ -54,4 +54,12 @@ interface MessageConfigInterface
      * @return bool
      */
     public function useRevisions(): bool;
+
+    /**
+     * Locale that all default translations are in (gettext calls)
+     * This locale won't get saved to database and won't be exported
+     *
+     * @return string
+     */
+    public function getDefaultLocale(): string;
 }

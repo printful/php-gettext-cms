@@ -40,7 +40,7 @@ class MessageExtractor
 
     /**
      * @param ScanItem[] $items
-     * @return Translations[] List of translation files extracted (for each domain)
+     * @return Translations[] List of translations for each domain
      * @throws GettextCmsException
      */
     public function extract(array $items): array
