@@ -50,7 +50,7 @@ class JsMessageTest extends TestCase
             foreach ($v as $v2) {
                 $v2->setTranslation('Translation');
             }
-            $this->storage->saveTranslations($v);
+            $this->storage->createOrUpdate($v);
         }
 
         $translations = $this->storage->getEnabledTranslatedJs('en_US', 'domain');

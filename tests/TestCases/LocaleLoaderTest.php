@@ -71,7 +71,7 @@ class LocaleLoaderTest extends TestCase
 
         $this->setConfig($domain, [], false);
 
-        $this->storage->saveSingleTranslation($locale, $domain, (new Translation('', 'O1'))->setTranslation('T1'));
+        $this->storage->createOrUpdateSingle($locale, $domain, (new Translation('', 'O1'))->setTranslation('T1'));
         $this->builder->export($locale, $domain);
 
         self::assertEquals('O1', _('O1'), 'Translation does not exist');
@@ -100,11 +100,11 @@ class LocaleLoaderTest extends TestCase
         $this->setConfig($domain, [], false);
 
         $t1 = (new Translation('', 'Original'))->setTranslation('Eng');
-        $this->storage->saveSingleTranslation($locale1, $domain, $t1);
+        $this->storage->createOrUpdateSingle($locale1, $domain, $t1);
         $this->builder->export($locale1, $domain);
 
         $t2 = (new Translation('', 'Original'))->setTranslation('Ger');
-        $this->storage->saveSingleTranslation($locale2, $domain, $t2);
+        $this->storage->createOrUpdateSingle($locale2, $domain, $t2);
         $this->builder->export($locale2, $domain);
 
         self::assertTrue($this->loader->load($locale1));
@@ -209,7 +209,7 @@ class LocaleLoaderTest extends TestCase
     private function addAndExport($locale, $domain, $original, $translation)
     {
         $t = (new Translation('', $original))->setTranslation($translation);
-        $this->storage->saveSingleTranslation($locale, $domain, $t);
+        $this->storage->createOrUpdateSingle($locale, $domain, $t);
         $this->builder->export($locale, $domain);
     }
 

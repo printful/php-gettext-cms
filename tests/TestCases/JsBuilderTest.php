@@ -62,7 +62,7 @@ class JsBuilderTest extends TestCase
             $translation->addReference('file.js', 1);
         }
 
-        $this->storage->saveSingleTranslation(
+        $this->storage->createOrUpdateSingle(
             $this->locale,
             $domain,
             $translation

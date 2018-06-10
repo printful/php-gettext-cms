@@ -174,7 +174,7 @@ class BuilderTest extends TestCase
 
     private function add(string $original, string $translation, string $context = ''): self
     {
-        $this->storage->saveSingleTranslation(
+        $this->storage->createOrUpdateSingle(
             $this->locale,
             $this->domain,
             (new Translation($context, $original))->setTranslation($translation)

@@ -66,7 +66,7 @@ class DynamicMessageImporter
 
             foreach ($this->messages as $context => $messages) {
                 foreach ($messages as $message) {
-                    $this->storage->saveSingleTranslation(
+                    $this->storage->createOrUpdateSingle(
                         $locale,
                         $domain,
                         new Translation($context, $message)

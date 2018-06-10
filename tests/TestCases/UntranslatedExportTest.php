@@ -44,15 +44,15 @@ class UntranslatedExportTest extends TestCase
     public function testSimpleUntranslated()
     {
         // Save two untranslated items
-        $this->storage->saveSingleTranslation($this->locale, $this->domain, new Translation('ctx', 'O1'));
-        $this->storage->saveSingleTranslation($this->locale, $this->domain, new Translation('', 'O2'));
+        $this->storage->createOrUpdateSingle($this->locale, $this->domain, new Translation('ctx', 'O1'));
+        $this->storage->createOrUpdateSingle($this->locale, $this->domain, new Translation('', 'O2'));
 
         // Same domain, but string is translated
-        $this->storage->saveSingleTranslation($this->locale, $this->domain,
+        $this->storage->createOrUpdateSingle($this->locale, $this->domain,
             (new Translation('', 'O3'))->setTranslation('T3'));
 
         // Save random translation in a different domain/locale
-        $this->storage->saveSingleTranslation('en_US', 'random', new Translation('', 'random'));
+        $this->storage->createOrUpdateSingle('en_US', 'random', new Translation('', 'random'));
 
         $ts = Translations::fromPoString($this->exporter->exportToString($this->locale, $this->domain));
 
@@ -64,7 +64,7 @@ class UntranslatedExportTest extends TestCase
     public function testDisabledTranslationNotExported()
     {
         $t = (new Translation('', 'O1'))->setDisabled(true);
-        $this->storage->saveSingleTranslation($this->locale, $this->domain, $t);
+        $this->storage->createOrUpdateSingle($this->locale, $this->domain, $t);
 
         $ts = Translations::fromPoString($this->exporter->exportToString($this->locale, $this->domain));
 
@@ -75,7 +75,7 @@ class UntranslatedExportTest extends TestCase
     {
         $t = (new Translation('', 'O1', 'P1'))->setTranslation('T1');
 
-        $this->storage->saveSingleTranslation($this->locale, $this->domain, $t);
+        $this->storage->createOrUpdateSingle($this->locale, $this->domain, $t);
 
         $ts = Translations::fromPoString($this->exporter->exportToString($this->locale, $this->domain));
 
@@ -87,7 +87,7 @@ class UntranslatedExportTest extends TestCase
         // lv_LV locale requires 3 plural forms, so this translation counts as untranslated
         $t = (new Translation('', 'O1', 'P1'))->setTranslation('T1')->setPluralTranslations(['PF1', 'PF2', '']);
 
-        $this->storage->saveSingleTranslation($this->locale, $this->domain, $t);
+        $this->storage->createOrUpdateSingle($this->locale, $this->domain, $t);
 
         $ts = Translations::fromPoString($this->exporter->exportToString($this->locale, $this->domain));
 
@@ -101,7 +101,7 @@ class UntranslatedExportTest extends TestCase
             ->setTranslation('T1')
             ->setPluralTranslations(['PF1', 'PF2', 'PF3']);
 
-        $this->storage->saveSingleTranslation($this->locale, $this->domain, $t);
+        $this->storage->createOrUpdateSingle($this->locale, $this->domain, $t);
 
         $ts = Translations::fromPoString($this->exporter->exportToString($this->locale, $this->domain));
 
@@ -116,7 +116,7 @@ class UntranslatedExportTest extends TestCase
             ->setPluralTranslations(['PF1', 'PF2']);
 
         $locale = 'en_US';
-        $this->storage->saveSingleTranslation($locale, $this->domain, $t);
+        $this->storage->createOrUpdateSingle($locale, $this->domain, $t);
 
         $ts = Translations::fromPoString($this->exporter->exportToString($locale, $this->domain));
 

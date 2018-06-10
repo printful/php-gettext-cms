@@ -46,7 +46,7 @@ class StorageTest extends TestCase
             ->setTranslation('Orģināls Divi')
             ->setDisabled(true);
 
-        $this->storage->saveTranslations($translations);
+        $this->storage->createOrUpdate($translations);
 
         $translationsFound = $this->storage->getAll($translations->getLanguage(), $translations->getDomain());
 
@@ -64,7 +64,7 @@ class StorageTest extends TestCase
             ->setTranslation('Teksts');
 
         // Initial save with disabled text
-        $this->storage->saveTranslations($translations);
+        $this->storage->createOrUpdate($translations);
 
         // Create a new translations, but this time it's eanbled and untranslated
         $t2 = $t1->getClone()
@@ -76,7 +76,7 @@ class StorageTest extends TestCase
             ->setDomain('domain');
         $newTranslations[] = $t2;
 
-        $this->storage->saveTranslations($newTranslations);
+        $this->storage->createOrUpdate($newTranslations);
 
         $returned = $this->storage->getAll($translations->getLanguage(), $translations->getDomain());
 
@@ -98,7 +98,7 @@ class StorageTest extends TestCase
         $translations->insert('', 'O2'); // Untranslated
         $translations->insert('', 'O3')->setTranslation('T3')->setDisabled(true); // Disabled
 
-        $this->storage->saveTranslations($translations);
+        $this->storage->createOrUpdate($translations);
 
         $enabledTranslated = $this->storage->getEnabledTranslated($locale, $domain);
         $foundTranslation = $enabledTranslated->find('', 'O1');
@@ -114,7 +114,7 @@ class StorageTest extends TestCase
         $t = (new Translations)->setLanguage('lv_LV')->setDomain('domain');
         $t->insert('', 'O1', 'P1')->setTranslation('T1'); // Plural is not translated
 
-        $this->storage->saveTranslations($t);
+        $this->storage->createOrUpdate($t);
 
         self::assertEquals(
             $t,
@@ -127,14 +127,14 @@ class StorageTest extends TestCase
     {
         $translations = (new Translations)->setDomain('domain');
         self::expectException(InvalidTranslationException::class);
-        $this->storage->saveTranslations($translations);
+        $this->storage->createOrUpdate($translations);
     }
 
     public function testPreventSavingWithoutDomain()
     {
         $translations = (new Translations)->setLanguage('en_US');
         self::expectException(InvalidTranslationException::class);
-        $this->storage->saveTranslations($translations);
+        $this->storage->createOrUpdate($translations);
     }
 
     public function testDisabledTranslationIsNotEnabledAfterSaving()
@@ -146,7 +146,7 @@ class StorageTest extends TestCase
             ->setTranslation('T2')
             ->setDisabled(true);
 
-        $this->storage->saveSingleTranslation($locale, $domain, $t);
+        $this->storage->createOrUpdateSingle($locale, $domain, $t);
 
         self::assertCount(1, $this->storage->getAll($locale, $domain), 'One translation is saved');
         self::assertEmpty($this->storage->getAllEnabled($locale, $domain), 'No enabled translations exist');
@@ -156,7 +156,7 @@ class StorageTest extends TestCase
             ->setPluralTranslations(['TP1'])
             ->setDisabled(false); // Enabled
 
-        $this->storage->saveTranslatedValue($locale, $domain, $t2);
+        $this->storage->saveTranslatedSingle($locale, $domain, $t2);
 
         $allTs = $this->storage->getAll($locale, $domain);
         /** @var Translation $tResult */
@@ -168,7 +168,7 @@ class StorageTest extends TestCase
 
     public function testUntranslatedSavingDoesNothing()
     {
-        $wasSaved = $this->storage->saveTranslatedValue('en_US', 'domain', new Translation('', 'O1'));
+        $wasSaved = $this->storage->saveTranslatedSingle('en_US', 'domain', new Translation('', 'O1'));
         self::assertFalse($wasSaved, 'Nothing was saved, because not translated');
     }
 
@@ -176,7 +176,7 @@ class StorageTest extends TestCase
     {
         $t = new Translation('', 'O1');
         $t->setTranslation('T1');
-        $wasSaved = $this->storage->saveTranslatedValue('en_US', 'domain', $t);
+        $wasSaved = $this->storage->saveTranslatedSingle('en_US', 'domain', $t);
         self::assertFalse($wasSaved, 'Nothing was saved, because translation is unknown');
     }
 

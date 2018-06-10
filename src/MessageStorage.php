@@ -34,21 +34,30 @@ class MessageStorage
      * @param Translations $translations
      * @throws InvalidTranslationException
      */
-    public function saveTranslations(Translations $translations)
+    public function createOrUpdate(Translations $translations)
     {
-        $locale = $translations->getLanguage();
-        $domain = (string)$translations->getDomain();
+        $this->validateHeaders($translations);
 
-        if (!$locale) {
+        $locale = $translations->getLanguage();
+        $domain = $translations->getDomain();
+
+        foreach ($translations as $translation) {
+            $this->createOrUpdateSingle($locale, $domain, $translation);
+        }
+    }
+
+    /**
+     * @param Translations $translations
+     * @throws InvalidTranslationException
+     */
+    private function validateHeaders(Translations $translations)
+    {
+        if (!$translations->getLanguage()) {
             throw new InvalidTranslationException('Locale is missing');
         }
 
-        if (!$domain) {
+        if (!$translations->getDomain()) {
             throw new InvalidTranslationException('Domain is missing');
-        }
-
-        foreach ($translations as $v) {
-            $this->saveSingleTranslation($locale, $domain, $v);
         }
     }
 
@@ -60,7 +69,7 @@ class MessageStorage
      * @param Translation $translation
      * @return bool
      */
-    public function saveSingleTranslation(string $locale, string $domain, Translation $translation): bool
+    public function createOrUpdateSingle(string $locale, string $domain, Translation $translation): bool
     {
         // Make a clone so we don't modify the passed instance
         $translation = $translation->getClone();
@@ -87,6 +96,24 @@ class MessageStorage
     }
 
     /**
+     * Save translation object for a single domain and locale
+     *
+     * @param Translations $translations
+     * @throws InvalidTranslationException
+     */
+    public function saveTranslated(Translations $translations)
+    {
+        $this->validateHeaders($translations);
+
+        $locale = $translations->getLanguage();
+        $domain = $translations->getDomain();
+
+        foreach ($translations as $translation) {
+            $this->saveTranslatedSingle($locale, $domain, $translation);
+        }
+    }
+
+    /**
      * Function for saving only translated values.
      * This will not modify disabled state and will not create new entries in repository, only modifies existing
      *
@@ -95,7 +122,7 @@ class MessageStorage
      * @param Translation $translation
      * @return bool
      */
-    public function saveTranslatedValue(string $locale, string $domain, Translation $translation): bool
+    public function saveTranslatedSingle(string $locale, string $domain, Translation $translation): bool
     {
         if (!$translation->hasTranslation()) {
             return false;
