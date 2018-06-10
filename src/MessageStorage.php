@@ -140,7 +140,8 @@ class MessageStorage
 
         // Make sure we do not drop previous plural translations if current one does not contain one
         $pluralTranslations = $translation->getPluralTranslations();
-        if ($pluralTranslations) {
+
+        if (!empty($pluralTranslations)) {
             $existingTranslation->setPluralTranslations($pluralTranslations);
         }
 

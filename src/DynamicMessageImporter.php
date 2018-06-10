@@ -1,11 +1,10 @@
 <?php
 
-namespace Printful\GettextCms\Structures;
+namespace Printful\GettextCms;
 
 use Gettext\Translation;
 use Printful\GettextCms\Exceptions\MissingMessagesException;
 use Printful\GettextCms\Interfaces\MessageConfigInterface;
-use Printful\GettextCms\MessageStorage;
 
 /**
  * Class allows adding dynamically generated translations which are not present in files.

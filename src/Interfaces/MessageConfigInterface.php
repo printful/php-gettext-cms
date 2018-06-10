@@ -7,7 +7,7 @@ interface MessageConfigInterface
     /**
      * List of locales you are supporting.
      * Format is en_US, lv_LV, ru_RU, etc.
-     * 
+     *
      * @see https://www.gnu.org/software/gettext/manual/html_node/Locale-Names.html
      *
      * @return string[]

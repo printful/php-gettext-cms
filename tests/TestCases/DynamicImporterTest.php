@@ -1,13 +1,14 @@
-<?php /** @noinspection PhpUnhandledExceptionInspection */
+<?php
+/** @noinspection PhpUnhandledExceptionInspection */
 
 namespace Printful\GettextCms\Tests\TestCases;
 
 use Mockery;
 use Mockery\Mock;
+use Printful\GettextCms\DynamicMessageImporter;
 use Printful\GettextCms\Exceptions\MissingMessagesException;
 use Printful\GettextCms\Interfaces\MessageConfigInterface;
 use Printful\GettextCms\MessageStorage;
-use Printful\GettextCms\Structures\DynamicMessageImporter;
 use Printful\GettextCms\Tests\Stubs\MessageRepositoryStub;
 use Printful\GettextCms\Tests\TestCase;
 
