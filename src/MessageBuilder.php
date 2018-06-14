@@ -31,6 +31,8 @@ class MessageBuilder
     }
 
     /**
+     * Export translated messages to MO files for gettext usage
+     *
      * @param string $locale
      * @param string $domain
      * @return bool

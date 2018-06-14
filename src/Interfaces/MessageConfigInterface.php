@@ -62,4 +62,14 @@ interface MessageConfigInterface
      * @return string
      */
     public function getDefaultLocale(): string;
+
+    /**
+     * Use short functions from package for translations.
+     * This is recommended if you use domain revisions so you do not have to manually resolve revisions
+     * To see the function list, check out:
+     * @see \Printful\GettextCms\MessageManager::$shortFunctions
+     *
+     * @return bool
+     */
+    public function useShortFunctions(): bool;
 }

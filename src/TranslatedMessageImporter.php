@@ -26,8 +26,9 @@ class TranslatedMessageImporter
     }
 
     /**
-     * @param Translations $translations
+     * Import translations from translation object
      *
+     * @param Translations $translations
      * @throws UnsupportedLocaleException
      * @throws UnsupportedDomainException
      * @throws InvalidTranslationException
@@ -46,5 +47,18 @@ class TranslatedMessageImporter
         }
 
         $this->storage->saveTranslated($translations);
+    }
+
+    /**
+     * Import Translations from PO string
+     *
+     * @param string $po
+     * @throws InvalidTranslationException
+     * @throws UnsupportedDomainException
+     * @throws UnsupportedLocaleException
+     */
+    public function importFromPo(string $po)
+    {
+        $this->importFromTranslations(Translations::fromPoString($po));
     }
 }
