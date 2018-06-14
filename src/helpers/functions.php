@@ -8,7 +8,7 @@ if (!function_exists('_n')) {
      *
      * @param string $singular Original string in singular form
      * @param string $plural Original string in plural form
-     * @param string $n Value number
+     * @param int $n Value number
      * @return string
      */
     function _n($singular, $plural, $n)
@@ -99,7 +99,7 @@ if (!function_exists('_dn')) {
      * @param string $domain Name of the domain
      * @param string $singular Original string in singular form
      * @param string $plural Original string in plural form
-     * @param string $n Value number
+     * @param int $n Value number
      * @return string
      */
     function _dn($domain, $singular, $plural, $n)
