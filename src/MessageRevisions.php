@@ -33,6 +33,11 @@ class MessageRevisions
      */
     public function getRevisionedDomain(string $locale, string $domain): string
     {
+        if ($locale === $this->config->getDefaultLocale()) {
+            // We do not revision default domain because all texts are defined in the code and not cached by gettext
+            return $domain;
+        }
+
         if (!$this->revisionCache) {
             $this->revisionCache = $this->readFromFile();
         }
@@ -80,6 +85,11 @@ class MessageRevisions
      */
     public function saveRevision(string $locale, string $originalDomain, string $revisionedDomain): bool
     {
+        if ($locale === $this->config->getDefaultLocale()) {
+            // No point in saving default locale revision
+            return true;
+        }
+
         $revisions = $this->readFromFile();
 
         $previousRevision = $revisions->getRevisionedDomain($locale, $originalDomain);

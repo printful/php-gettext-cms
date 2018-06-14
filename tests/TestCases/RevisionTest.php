@@ -26,6 +26,9 @@ class RevisionTest extends TestCase
 
         $this->config = Mockery::mock(MessageConfigInterface::class);
 
+        // Set a fake default locale so all tests will work as if their locale is not the default
+        $this->config->shouldReceive('getDefaultLocale')->andReturn('xx_XX')->byDefault();
+
         $this->tempDir = realpath(__DIR__ . '/../assets/temp') . '/revisions';
 
         $this->deleteDirectory($this->tempDir);
@@ -34,7 +37,7 @@ class RevisionTest extends TestCase
 
     protected function tearDown()
     {
-        // $this->deleteDirectory($this->tempDir);
+        $this->deleteDirectory($this->tempDir);
         parent::tearDown();
     }
 
@@ -91,5 +94,21 @@ class RevisionTest extends TestCase
         self::expectException(InvalidPathException::class);
 
         $revisions->saveRevision('en_US', 'domain', 'domain-2');
+    }
+
+    public function testDefaultLocaleIsNotRevisioned()
+    {
+        $this->config->shouldReceive('getDefaultLocale')->andReturn('en_EN')->byDefault();
+        $this->config->shouldReceive('getMoDirectory')->andReturn($this->tempDir)->byDefault();
+
+        $revisions = new MessageRevisions($this->config);
+
+        $revisions->saveRevision('en_EN', 'domain', 'domain-12345');
+
+        self::assertEquals(
+            'domain',
+            $revisions->getRevisionedDomain('en_EN', 'domain'),
+            'Non-revisioned domain returned'
+        );
     }
 }

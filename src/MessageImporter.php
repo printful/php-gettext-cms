@@ -27,7 +27,8 @@ class MessageImporter
     }
 
     /**
-     * Extract translations and save them all to repository
+     * Extract messages and save them all to repository
+     * Careful! Messages for each domain that were not found in this scan will be disabled.
      *
      * @param ScanItem[] $scanItems
      * @throws GettextCmsException

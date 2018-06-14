@@ -38,6 +38,12 @@ class MessageBuilder
      */
     public function export(string $locale, string $domain): bool
     {
+        if ($locale === $this->config->getDefaultLocale()) {
+            // No point in exporting default locale, because all the strings are already in the code and
+            // will be used as a fallback for gettext
+            return true;
+        }
+
         $translations = $this->storage->getEnabledTranslated($locale, $domain);
 
         $revisionedDomain = null;

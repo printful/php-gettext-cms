@@ -46,6 +46,9 @@ class LocaleLoaderTest extends TestCase
         $this->dir = realpath(__DIR__ . '/../assets/temp') . '/generated-translations';
 
         $this->config = Mockery::mock(MessageConfigInterface::class);
+        
+        // Set a fake default locale so all tests will work as if their locale is not the default
+        $this->config->shouldReceive('getDefaultLocale')->andReturn('xx_XX');
         $this->config->shouldReceive('getMoDirectory')->andReturn($this->dir)->atLeast()->once();
 
         $this->storage = new MessageStorage(new MessageRepositoryStub);

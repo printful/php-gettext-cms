@@ -44,7 +44,7 @@ class ScanItem
      * @param string $path Path to a directory or a file to scan
      * @param array $extensions List of extensions to scan for
      * @param bool $recursive Scan directory recursively
-     * @param array|null $functions
+     * @param array|null $functions Functions that should be scanned for additionally, format: [customFunction => gettext|dgettext|..]]
      *
      * @see ScanItem::$functions
      */

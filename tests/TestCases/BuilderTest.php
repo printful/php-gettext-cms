@@ -22,7 +22,7 @@ use Printful\GettextCms\Tests\TestCase;
 class BuilderTest extends TestCase
 {
     /** @var Mock|MessageConfigInterface */
-    private $mockConfig;
+    private $config;
 
     /** @var MessageRepositoryInterface */
     private $repository;
@@ -54,16 +54,19 @@ class BuilderTest extends TestCase
 
         $this->root = vfsStream::setup('virtualMoDirectory/');
 
-        $this->mockConfig = Mockery::mock(MessageConfigInterface::class);
+        $this->config = Mockery::mock(MessageConfigInterface::class);
 
-        $this->mockConfig->shouldReceive('useRevisions')->andReturn(false)->byDefault();
+        // Set a fake default locale so all tests will work as if their locale is not the default
+        $this->config->shouldReceive('getDefaultLocale')->andReturn('xx_XX')->byDefault();
+
+        $this->config->shouldReceive('useRevisions')->andReturn(false)->byDefault();
 
         $this->repository = new MessageRepositoryStub;
-        $this->revisions = new MessageRevisions($this->mockConfig);
+        $this->revisions = new MessageRevisions($this->config);
         $this->storage = new MessageStorage($this->repository);
 
         $this->exporter = new MessageBuilder(
-            $this->mockConfig,
+            $this->config,
             $this->storage,
             $this->revisions
         );
@@ -84,7 +87,7 @@ class BuilderTest extends TestCase
 
         self::assertFalse($this->root->hasChild($expectedPath), 'Mo files does not exist');
 
-        $this->mockConfig->shouldReceive('getMoDirectory')->andReturn($dir)->once();
+        $this->config->shouldReceive('getMoDirectory')->andReturn($dir)->once();
 
         $this->exporter->export($locale, $domain);
 
@@ -98,7 +101,7 @@ class BuilderTest extends TestCase
     {
         $this->add('Original', 'Translation');
 
-        $this->mockConfig->shouldReceive('getMoDirectory')->andReturn('missing-directory')->once();
+        $this->config->shouldReceive('getMoDirectory')->andReturn('missing-directory')->once();
 
         self::expectException(InvalidPathException::class);
 
@@ -109,8 +112,8 @@ class BuilderTest extends TestCase
     {
         $dir = $this->root->url();
 
-        $this->mockConfig->shouldReceive('getMoDirectory')->andReturn($dir)->once();
-        $this->mockConfig->shouldReceive('useRevisions')->andReturn(true)->byDefault();
+        $this->config->shouldReceive('getMoDirectory')->andReturn($dir)->once();
+        $this->config->shouldReceive('useRevisions')->andReturn(true)->byDefault();
 
         $this->add('Original', 'Translation');
 
@@ -129,8 +132,8 @@ class BuilderTest extends TestCase
     {
         $dir = $this->root->url();
 
-        $this->mockConfig->shouldReceive('getMoDirectory')->andReturn($dir)->once();
-        $this->mockConfig->shouldReceive('useRevisions')->andReturn(true)->byDefault();
+        $this->config->shouldReceive('getMoDirectory')->andReturn($dir)->once();
+        $this->config->shouldReceive('useRevisions')->andReturn(true)->byDefault();
 
         $this->add('Original', 'Translation');
 
@@ -147,6 +150,16 @@ class BuilderTest extends TestCase
 
         self::assertFalse($this->root->hasChild($pathFirstRevision), 'Previous file is removed');
         self::assertTrue($this->root->hasChild($pathSecondRevision), 'New revision file was created');
+    }
+
+    public function testDefaultLocaleIsNotExported()
+    {
+        // Set a fake default locale so all tests will work as if their locale is not the default
+        $this->config->shouldReceive('getDefaultLocale')->andReturn('en_EN')->byDefault();
+        $this->config->shouldReceive('getMoDirectory')->andReturn('whatever')->never();
+
+        // If there were an attempt to export, error would happend because mo directory does not exist
+        self::assertTrue($this->exporter->export('en_EN', 'domain'), 'Default domain is not exported');
     }
 
     private function verifyTranslations(array $messages, string $locale, string $domain, string $moPathname)
