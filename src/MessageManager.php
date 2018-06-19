@@ -178,6 +178,16 @@ class MessageManager
     }
 
     /**
+     * Get the dynamic importer for adding dynamic messages
+     *
+     * @return DynamicMessageImporter
+     */
+    public function getDynamicMessageImporter(): DynamicMessageImporter
+    {
+        return new DynamicMessageImporter($this->config, $this->storage);
+    }
+
+    /**
      * Functions to scan for including (default functions + custom functions)
      *
      * @return array

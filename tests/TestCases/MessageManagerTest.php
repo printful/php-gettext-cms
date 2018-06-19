@@ -48,10 +48,11 @@ class MessageManagerTest extends TestCase
     {
         $dOther = 'other';
         $dDefault = 'default';
+        $dDynamic = 'dynamic';
 
         $this->config->shouldReceive('getDefaultLocale')->andReturn('en_US')->atLeast()->once();
         $this->config->shouldReceive('getLocales')->andReturn(['en_US', 'de_DE'])->atLeast()->once();
-        $this->config->shouldReceive('getOtherDomains')->andReturn([$dOther])->atLeast()->once();
+        $this->config->shouldReceive('getOtherDomains')->andReturn([$dOther, $dDynamic])->atLeast()->once();
         $this->config->shouldReceive('getDefaultDomain')->andReturn($dDefault)->atLeast()->once();
         $this->config->shouldReceive('getMoDirectory')->andReturn($this->tempDir)->atLeast()->once();
         $this->config->shouldReceive('useRevisions')->andReturn(true)->atLeast()->once();
@@ -64,6 +65,12 @@ class MessageManagerTest extends TestCase
         $manager->extractAndSaveFromFiles([
             new ScanItem(__DIR__ . '/../assets/dummy-directory-2/custom-functions.php'),
         ]);
+
+        // Add untranslated dynamic messages
+        $manager->getDynamicMessageImporter()
+            ->add('d1')
+            ->add('d2 ctx', 'ctx')
+            ->saveAndDisabledPrevious($dDynamic);
 
         // Translate default domain and import translations
         $ts = Translations::fromPoString($manager->exportUntranslated('de_DE', $dDefault));
@@ -79,6 +86,12 @@ class MessageManagerTest extends TestCase
         $ts->find('ctx', '_dc')->setTranslation('_dc t');
         $ts->find('', '_dn')->setTranslation('_dn t')->setPluralTranslations(['_dn pt']);
         $ts->find('ctx', '_dnc')->setTranslation('_dnc t')->setPluralTranslations(['_dnc pt']);
+        $manager->importTranslated(Po::toString($ts));
+
+        // Translate dynamic messages
+        $ts = Translations::fromPoString($manager->exportUntranslated('de_DE', $dDynamic));
+        $ts->find('', 'd1')->setTranslation('d1 t');
+        $ts->find('ctx', 'd2 ctx')->setTranslation('d2 ctx t');
         $manager->importTranslated(Po::toString($ts));
 
         $manager->buildTranslationFiles();
@@ -100,5 +113,9 @@ class MessageManagerTest extends TestCase
         self::assertEquals('_dn pt', _dn($dOther, '_dn', '_dn p', 2), 'Other plural');
         self::assertEquals('_dnc t', _dnc($dOther, 'ctx', '_dnc', '_dnc p', 1), 'Other ctx singular');
         self::assertEquals('_dnc pt', _dnc($dOther, 'ctx', '_dnc', '_dnc p', 2), 'Other ctx plural');
+
+        // Verify dynamic messages
+        self::assertEquals('d1 t', _d($dDynamic, 'd1'), 'Dynamic');
+        self::assertEquals('d2 ctx t', _dc($dDynamic, 'ctx', 'd2 ctx'), 'Dynamic ctx');
     }
 }
