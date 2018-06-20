@@ -18,13 +18,20 @@ class UntranslatedMessageExporter
     }
 
     /**
+     * Export untranslated messages to a PO file string.
+     * If no messages exist, empty string is returned.
+     *
      * @param string $locale
      * @param string $domain
-     * @return string
+     * @return string PO file contents or empty string if nothing to export
      */
-    public function exportToString(string $locale, string $domain): string
+    public function exportPoString(string $locale, string $domain): string
     {
         $translations = $this->storage->getRequiresTranslating($locale, $domain);
+
+        if (!$translations->count()) {
+            return '';
+        }
 
         return Po::toString($translations);
     }

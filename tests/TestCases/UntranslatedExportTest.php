@@ -54,7 +54,7 @@ class UntranslatedExportTest extends TestCase
         // Save random translation in a different domain/locale
         $this->storage->createOrUpdateSingle('en_US', 'random', new Translation('', 'random'));
 
-        $ts = Translations::fromPoString($this->exporter->exportToString($this->locale, $this->domain));
+        $ts = Translations::fromPoString($this->exporter->exportPoString($this->locale, $this->domain));
 
         self::assertCount(2, $ts, 'One untranslated item');
         self::assertNotFalse($ts->find('ctx', 'O1'), 'Untranslated item is within list');
@@ -66,9 +66,9 @@ class UntranslatedExportTest extends TestCase
         $t = (new Translation('', 'O1'))->setDisabled(true);
         $this->storage->createOrUpdateSingle($this->locale, $this->domain, $t);
 
-        $ts = Translations::fromPoString($this->exporter->exportToString($this->locale, $this->domain));
+        $po = $this->exporter->exportPoString($this->locale, $this->domain);
 
-        self::assertEmpty($ts, 'No translations exist');
+        self::assertEmpty($po, 'No translations exist');
     }
 
     public function testTranslationMissingPluralTranslationIsExported()
@@ -77,7 +77,7 @@ class UntranslatedExportTest extends TestCase
 
         $this->storage->createOrUpdateSingle($this->locale, $this->domain, $t);
 
-        $ts = Translations::fromPoString($this->exporter->exportToString($this->locale, $this->domain));
+        $ts = Translations::fromPoString($this->exporter->exportPoString($this->locale, $this->domain));
 
         self::assertCount(1, $ts, 'One translation exists');
     }
@@ -89,7 +89,7 @@ class UntranslatedExportTest extends TestCase
 
         $this->storage->createOrUpdateSingle($this->locale, $this->domain, $t);
 
-        $ts = Translations::fromPoString($this->exporter->exportToString($this->locale, $this->domain));
+        $ts = Translations::fromPoString($this->exporter->exportPoString($this->locale, $this->domain));
 
         self::assertCount(1, $ts, 'Plural translations missing, is exported');
     }
@@ -103,7 +103,7 @@ class UntranslatedExportTest extends TestCase
 
         $this->storage->createOrUpdateSingle($this->locale, $this->domain, $t);
 
-        $ts = Translations::fromPoString($this->exporter->exportToString($this->locale, $this->domain));
+        $ts = Translations::fromPoString($this->exporter->exportPoString($this->locale, $this->domain));
 
         self::assertEmpty($ts, 'All plural forms are present, nothing is exported');
     }
@@ -118,7 +118,7 @@ class UntranslatedExportTest extends TestCase
         $locale = 'en_US';
         $this->storage->createOrUpdateSingle($locale, $this->domain, $t);
 
-        $ts = Translations::fromPoString($this->exporter->exportToString($locale, $this->domain));
+        $ts = Translations::fromPoString($this->exporter->exportPoString($locale, $this->domain));
 
         self::assertEmpty($ts, 'All plural forms are present, nothing is exported');
     }

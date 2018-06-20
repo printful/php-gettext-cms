@@ -7,4 +7,3 @@
 ### TODO's
 
 * Optimize short functions so they use static variables to cache revisioned domains (metrics required)
-* Dynamic message importing from manager

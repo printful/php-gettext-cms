@@ -21,6 +21,9 @@ class MessageManagerTest extends TestCase
     /** @var string */
     private $tempDir;
 
+    /** @var string */
+    private $zipPathname;
+
     protected function setUp()
     {
         parent::setUp();
@@ -29,6 +32,8 @@ class MessageManagerTest extends TestCase
 
         // Make a temp directory for MO files
         $this->tempDir = realpath(__DIR__ . '/../assets/temp') . '/manager';
+        $this->zipPathname = $this->tempDir . '/' . 'export.zip';
+
         $this->cleanup();
         @mkdir($this->tempDir);
     }
@@ -72,8 +77,12 @@ class MessageManagerTest extends TestCase
             ->add('d2 ctx', 'ctx')
             ->saveAndDisabledPrevious($dDynamic);
 
+        // Export zip
+        $manager->exportUntranslatedPoZip($this->zipPathname, 'de_DE');
+        self::assertFileExists($this->zipPathname, 'Zip file is stored');
+
         // Translate default domain and import translations
-        $ts = Translations::fromPoString($manager->exportUntranslated('de_DE', $dDefault));
+        $ts = Translations::fromPoString($manager->exportUntranslatedPo('de_DE', $dDefault));
         $ts->find('', '_')->setTranslation('_ t');
         $ts->find('ctx', '_c')->setTranslation('_c t');
         $ts->find('', '_n')->setTranslation('_n t')->setPluralTranslations(['_n pt']);
@@ -81,7 +90,7 @@ class MessageManagerTest extends TestCase
         $manager->importTranslated(Po::toString($ts));
 
         // Translate other domain and import translations
-        $ts = Translations::fromPoString($manager->exportUntranslated('de_DE', $dOther));
+        $ts = Translations::fromPoString($manager->exportUntranslatedPo('de_DE', $dOther));
         $ts->find('', '_d')->setTranslation('_d t');
         $ts->find('ctx', '_dc')->setTranslation('_dc t');
         $ts->find('', '_dn')->setTranslation('_dn t')->setPluralTranslations(['_dn pt']);
@@ -89,7 +98,7 @@ class MessageManagerTest extends TestCase
         $manager->importTranslated(Po::toString($ts));
 
         // Translate dynamic messages
-        $ts = Translations::fromPoString($manager->exportUntranslated('de_DE', $dDynamic));
+        $ts = Translations::fromPoString($manager->exportUntranslatedPo('de_DE', $dDynamic));
         $ts->find('', 'd1')->setTranslation('d1 t');
         $ts->find('ctx', 'd2 ctx')->setTranslation('d2 ctx t');
         $manager->importTranslated(Po::toString($ts));

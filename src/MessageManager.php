@@ -32,10 +32,15 @@ class MessageManager
         $this->loader = new LocaleLoader($config, new MessageRevisions($config));
         $this->config = $config;
         $this->storage = new MessageStorage($this->config->getRepository());
+
+        if ($config->useShortFunctions()) {
+            $this->declareFunctions();
+        }
     }
 
     /**
      * Initialize singleton instance
+     * Singleton is necessary for short functions because they need to access the revision functionality globally.
      *
      * @param MessageConfigInterface $config
      * @return MessageManager
@@ -43,10 +48,6 @@ class MessageManager
     public static function init(MessageConfigInterface $config): self
     {
         self::$instance = new static($config);
-
-        if ($config->useShortFunctions()) {
-            self::$instance->declareFunctions();
-        }
 
         return self::$instance;
     }
@@ -139,11 +140,29 @@ class MessageManager
      * @param string $domain
      * @return string
      */
-    public function exportUntranslated(string $locale, string $domain): string
+    public function exportUntranslatedPo(string $locale, string $domain): string
     {
         $exporter = new UntranslatedMessageExporter($this->storage);
 
-        return $exporter->exportToString($locale, $domain);
+        return $exporter->exportPoString($locale, $domain);
+    }
+
+    /**
+     * Create a zip archive with messages that require translations as PO files
+     *
+     * @param string $zipPathname Full pathname to the file where the ZIP archive should be written
+     * @param string $locale
+     * @param string[]|null $domains Domains to export. If not provided, export all domains defined in config
+     * @return bool
+     */
+    public function exportUntranslatedPoZip(string $zipPathname, string $locale, array $domains = null): bool
+    {
+        $exporter = new UntranslatedMessageZipExporter(
+            $this->config,
+            new UntranslatedMessageExporter($this->storage)
+        );
+
+        return $exporter->export($zipPathname, $locale, $domains);
     }
 
     /**

@@ -29,7 +29,8 @@ interface MessageConfigInterface
     public function getDefaultDomain(): string;
 
     /**
-     * List of other domain names that will be used and which messages to scan for
+     * List of other domain names that will be used and which messages to scan for.
+     * This should not include the default domain.
      *
      * @return string[]
      */
