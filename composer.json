@@ -4,7 +4,7 @@
     "type": "library",
     "require": {
         "php": ">=7.0",
-        "gettext/gettext": "dev-master",
+        "gettext/gettext": "^4.6.0",
         "league/flysystem": "^1.0"
     },
     "require-dev": {
@@ -12,12 +12,6 @@
         "mockery/mockery": "^1.1",
         "mikey179/vfsStream": "^1.6"
     },
-    "repositories": [
-        {
-            "type": "git",
-            "url": "https://github.com/briedis/Gettext.git"
-        }
-    ],
     "autoload": {
         "psr-4": {
             "Printful\\GettextCms\\": "src/"
