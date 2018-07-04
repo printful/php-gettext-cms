@@ -153,12 +153,13 @@ class MessageExtractor
 
         $files = $filesystem->listFiles('', $item->recursive);
 
+        // If no extensions are given, fallback to known extensions
+        $extensions = $item->extensions ?: array_keys(self::EXTRACTORS);
+
         // If extensions are set, filter other files out
-        if (!empty($item->extensions)) {
-            $files = array_filter($files, function ($file) use ($item) {
-                return in_array($file['extension'], $item->extensions);
-            });
-        }
+        $files = array_filter($files, function ($file) use ($item, $extensions) {
+            return in_array($file['extension'], $extensions);
+        });
 
         return array_map(function ($file) use ($dir) {
             return $dir . DIRECTORY_SEPARATOR . $file['path'];

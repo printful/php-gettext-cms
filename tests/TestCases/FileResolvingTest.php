@@ -53,7 +53,7 @@ class FileResolvingTest extends TestCase
         );
 
         $files2 = $this->scanner->resolvePathnames(
-            new ScanItem($dir . '/dummy-directory/sub-directory2/', ['php'])
+            new ScanItem($dir . '/dummy-directory/sub-directory2/')
         );
 
         $files = array_merge($files1, $files2);
