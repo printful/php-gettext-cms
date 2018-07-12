@@ -38,6 +38,7 @@ class DynamicImporterTest extends TestCase
         $domain = 'custom';
 
         $this->mockConfig->shouldReceive('getLocales')->once()->andReturn([$locale]);
+        $this->mockConfig->shouldReceive('getDefaultLocale')->once()->andReturn('en_US');
 
         $this->importer
             ->add('T1')
@@ -59,6 +60,7 @@ class DynamicImporterTest extends TestCase
         $domain = 'custom';
 
         $this->mockConfig->shouldReceive('getLocales')->twice()->andReturn([$locale]);
+        $this->mockConfig->shouldReceive('getDefaultLocale')->once()->andReturn('en_US');
 
         $this->importer
             ->add('T1')

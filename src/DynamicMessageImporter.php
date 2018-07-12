@@ -59,8 +59,15 @@ class DynamicMessageImporter
         }
 
         $locales = $this->config->getLocales();
+        $defaultLocale = $this->config->getDefaultLocale();
 
         foreach ($locales as $locale) {
+            if ($locale === $defaultLocale) {
+                // We do not save the default locale, because default locale is the gettext fallback
+                // if no other locale is set
+                continue;
+            }
+
             $this->storage->disableAll($locale, $domain);
 
             foreach ($this->messages as $context => $messages) {
