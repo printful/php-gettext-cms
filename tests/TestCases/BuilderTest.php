@@ -87,7 +87,7 @@ class BuilderTest extends TestCase
 
         self::assertFalse($this->root->hasChild($expectedPath), 'Mo files does not exist');
 
-        $this->config->shouldReceive('getMoDirectory')->andReturn($dir)->once();
+        $this->config->shouldReceive('getMoDirectory')->andReturn($dir)->atLeast()->once();
 
         $this->exporter->export($locale, $domain);
 
@@ -101,7 +101,7 @@ class BuilderTest extends TestCase
     {
         $this->add('Original', 'Translation');
 
-        $this->config->shouldReceive('getMoDirectory')->andReturn('missing-directory')->once();
+        $this->config->shouldReceive('getMoDirectory')->andReturn('missing-directory')->atLeast()->once();
 
         self::expectException(InvalidPathException::class);
 
@@ -112,7 +112,7 @@ class BuilderTest extends TestCase
     {
         $dir = $this->root->url();
 
-        $this->config->shouldReceive('getMoDirectory')->andReturn($dir)->once();
+        $this->config->shouldReceive('getMoDirectory')->andReturn($dir)->atLeast()->once();
         $this->config->shouldReceive('useRevisions')->andReturn(true)->byDefault();
 
         $this->add('Original', 'Translation');
@@ -132,7 +132,7 @@ class BuilderTest extends TestCase
     {
         $dir = $this->root->url();
 
-        $this->config->shouldReceive('getMoDirectory')->andReturn($dir)->once();
+        $this->config->shouldReceive('getMoDirectory')->andReturn($dir)->atLeast()->once();
         $this->config->shouldReceive('useRevisions')->andReturn(true)->byDefault();
 
         $this->add('Original', 'Translation');

@@ -50,8 +50,8 @@ class UntranslatedZipExportTest extends TestCase
         $this->storage = new MessageStorage($this->repository);
         $this->config = Mockery::mock(MessageConfigInterface::class);
 
-        $this->config->shouldReceive('getOtherDomains')->andReturn([$this->domainOther])->atLeast()->once();
-        $this->config->shouldReceive('getDefaultDomain')->andReturn($this->domain)->atLeast()->once();
+        $this->config->shouldReceive('getOtherDomains')->andReturn([$this->domainOther]);
+        $this->config->shouldReceive('getDefaultDomain')->andReturn($this->domain);
 
         $this->zipPathname = __DIR__ . '/../assets/temp/export.zip';
         $pathname = $this->zipPathname;

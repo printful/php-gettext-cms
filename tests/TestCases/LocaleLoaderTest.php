@@ -49,7 +49,7 @@ class LocaleLoaderTest extends TestCase
         
         // Set a fake default locale so all tests will work as if their locale is not the default
         $this->config->shouldReceive('getDefaultLocale')->andReturn('xx_XX');
-        $this->config->shouldReceive('getMoDirectory')->andReturn($this->dir)->atLeast()->once();
+        $this->config->shouldReceive('getMoDirectory')->andReturn($this->dir);
 
         $this->storage = new MessageStorage(new MessageRepositoryStub);
         $this->revisions = new MessageRevisions($this->config);

@@ -4,6 +4,7 @@ namespace Printful\GettextCms\Tests;
 
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
+use Mockery;
 
 abstract class TestCase extends \PHPUnit\Framework\TestCase
 {
@@ -27,5 +28,11 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     protected function getDummyFile(string $filename = 'dummy-file.php'): string
     {
         return __DIR__ . '/assets/dummy-directory/' . $filename;
+    }
+
+    protected function tearDown()
+    {
+        Mockery::close();
+        parent::tearDown();
     }
 }

@@ -108,8 +108,8 @@ class TranslationSavingTest extends TestCase
 
     private function configure(string $locale, string $defaultDomain, array $otherDomains)
     {
-        $this->config->shouldReceive('getLocales')->andReturn([$locale])->once();
-        $this->config->shouldReceive('getOtherDomains')->andReturn($otherDomains)->once();
-        $this->config->shouldReceive('getDefaultDomain')->andReturn($defaultDomain)->once();
+        $this->config->shouldReceive('getLocales')->andReturn([$locale]);
+        $this->config->shouldReceive('getOtherDomains')->andReturn($otherDomains);
+        $this->config->shouldReceive('getDefaultDomain')->andReturn($defaultDomain);
     }
 }
