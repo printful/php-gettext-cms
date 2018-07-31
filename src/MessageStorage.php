@@ -187,7 +187,9 @@ class MessageStorage
     {
         if (!array_key_exists($locale, $this->pluralFormCache)) {
             $info = Language::getById($locale);
-            $this->pluralFormCache[$locale] = count($info->categories);
+
+            // Minus one, because we do not count the original string as a plural
+            $this->pluralFormCache[$locale] = count($info->categories) - 1;
         }
 
         return $this->pluralFormCache[$locale];

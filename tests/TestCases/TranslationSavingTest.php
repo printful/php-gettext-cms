@@ -96,7 +96,7 @@ class TranslationSavingTest extends TestCase
             'One string has to be translated'
         );
 
-        $tTranslated = $t->getClone()->setTranslation('T1')->setPluralTranslations(['PT1', 'PT2']);
+        $tTranslated = $t->getClone()->setTranslation('T1')->setPluralTranslations(['PT2']);
 
         $this->storage->createOrUpdateSingle($locale, $domain, $tTranslated);
 

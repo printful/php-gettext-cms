@@ -85,7 +85,7 @@ class UntranslatedExportTest extends TestCase
     public function testMissingOnePluralFormIsExported()
     {
         // lv_LV locale requires 3 plural forms, so this translation counts as untranslated
-        $t = (new Translation('', 'O1', 'P1'))->setTranslation('T1')->setPluralTranslations(['PF1', 'PF2', '']);
+        $t = (new Translation('', 'O1', 'P1'))->setTranslation('T1')->setPluralTranslations(['PF2', '']);
 
         $this->storage->createOrUpdateSingle($this->locale, $this->domain, $t);
 
@@ -99,7 +99,7 @@ class UntranslatedExportTest extends TestCase
         // lv_LV locale requires 3 plural forms, this translation is complete
         $t = (new Translation('', 'O1', 'P1'))
             ->setTranslation('T1')
-            ->setPluralTranslations(['PF1', 'PF2', 'PF3']);
+            ->setPluralTranslations(['PF2', 'PF3']);
 
         $this->storage->createOrUpdateSingle($this->locale, $this->domain, $t);
 
@@ -113,7 +113,7 @@ class UntranslatedExportTest extends TestCase
         // lv_LV locale requires 3 plural forms, this translation is complete
         $t = (new Translation('', 'O1', 'P1'))
             ->setTranslation('T1')
-            ->setPluralTranslations(['PF1', 'PF2']);
+            ->setPluralTranslations(['PF2']);
 
         $locale = 'en_US';
         $this->storage->createOrUpdateSingle($locale, $this->domain, $t);
