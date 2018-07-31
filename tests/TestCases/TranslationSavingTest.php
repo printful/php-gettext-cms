@@ -79,6 +79,33 @@ class TranslationSavingTest extends TestCase
         self::assertCount(1, $this->storage->getEnabledTranslated($locale, $domain), 'One translation exists');
     }
 
+    public function testDoesNotRequireTranslationAfterPluralTranslated()
+    {
+        $locale = 'en_US';
+        $domain = 'default';
+
+        $this->configure($locale, $domain, []);
+
+        $ts = (new Translations)->setDomain($domain)->setLanguage($locale);
+        $t = $ts->insert('', 'O1', 'P1')->setTranslation('P1');
+
+        $this->storage->createOrUpdate($ts);
+
+        self::assertCount(1,
+            $this->storage->getRequiresTranslating($locale, $domain),
+            'One string has to be translated'
+        );
+
+        $tTranslated = $t->getClone()->setTranslation('T1')->setPluralTranslations(['PT1', 'PT2']);
+
+        $this->storage->createOrUpdateSingle($locale, $domain, $tTranslated);
+
+        self::assertEmpty(
+            $this->storage->getRequiresTranslating($locale, $domain),
+            'Nothing has to be translated'
+        );
+    }
+
     private function configure(string $locale, string $defaultDomain, array $otherDomains)
     {
         $this->config->shouldReceive('getLocales')->andReturn([$locale])->once();
