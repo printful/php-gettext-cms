@@ -32,6 +32,7 @@ class MessageManager
         $this->loader = new LocaleLoader($config, new MessageRevisions($config));
         $this->config = $config;
         $this->storage = new MessageStorage($this->config->getRepository());
+        $this->locale = $config->getDefaultLocale();
 
         if ($config->useShortFunctions()) {
             $this->declareFunctions();
