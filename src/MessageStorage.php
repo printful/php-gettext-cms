@@ -14,6 +14,9 @@ use Printful\GettextCms\Structures\MessageItem;
  */
 class MessageStorage
 {
+    private const TYPE_FILE = 'file';
+    private const TYPE_DYNAMIC = 'dynamic';
+
     /** @var MessageRepositoryInterface */
     private $repository;
 
@@ -62,7 +65,7 @@ class MessageStorage
     }
 
     /**
-     * Save a translation to repository by merging it to a previously saved version.
+     * Create or update a translation that is found in a file
      *
      * @param string $locale
      * @param string $domain
@@ -71,6 +74,37 @@ class MessageStorage
      */
     public function createOrUpdateSingle(string $locale, string $domain, Translation $translation): bool
     {
+        return $this->createOrUpdateSingleWithType($locale, $domain, $translation, self::TYPE_FILE);
+    }
+
+    /**
+     * Create or update a translation that is dynamically generated
+     *
+     * @param string $locale
+     * @param string $domain
+     * @param Translation $translation
+     * @return bool
+     */
+    public function createOrUpdateSingleDynamic(string $locale, string $domain, Translation $translation): bool
+    {
+        return $this->createOrUpdateSingleWithType($locale, $domain, $translation, self::TYPE_DYNAMIC);
+    }
+
+    /**
+     * Save a translation to repository by merging it to a previously saved version.
+     *
+     * @param string $locale
+     * @param string $domain
+     * @param Translation $translation
+     * @param string $type
+     * @return bool
+     */
+    private function createOrUpdateSingleWithType(
+        string $locale,
+        string $domain,
+        Translation $translation,
+        string $type
+    ): bool {
         // Make a clone so we don't modify the passed instance
         $translation = $translation->getClone();
 
@@ -82,15 +116,28 @@ class MessageStorage
             $existingTranslation = $this->itemToTranslation($existingItem);
             $translation->mergeWith($existingTranslation);
             $item = $this->translationToItem($locale, $domain, $translation);
-
-            // Override the disabled state of the existing translation
-            $item->isDisabled = $translation->isDisabled();
         } else {
             $item = $this->translationToItem($locale, $domain, $translation);
         }
 
+        $item->isInJs = $item->isInJs ?: $existingItem->isInJs;
+
+        if ($type == self::TYPE_DYNAMIC || $existingItem->isDynamic) {
+            $item->isDynamic = true;
+        }
+
+        if ($type == self::TYPE_FILE || $item->isInJs || $existingItem->isInFile) {
+            $item->isInFile = true;
+        }
+
         $item->hasOriginalTranslation = $translation->hasTranslation();
         $item->requiresTranslating = $this->requiresTranslating($locale, $translation);
+
+        $item->isDisabled = $item->isDisabled ?: (!$item->isInJs && !$item->isInFile && !$item->isDynamic);
+
+        if (!$this->hasChanged($existingItem, $item)) {
+            return true;
+        }
 
         return $this->repository->save($item);
     }
@@ -150,6 +197,10 @@ class MessageStorage
         $item->hasOriginalTranslation = true;
         // It's still possible that plurals are missing and this translation still needs work
         $item->requiresTranslating = $this->requiresTranslating($locale, $translation);
+
+        if (!$this->hasChanged($existingItem, $item)) {
+            return true;
+        }
 
         return $this->repository->save($item);
     }
@@ -264,7 +315,7 @@ class MessageStorage
 
         foreach ($item->references as $reference) {
             if ($this->isJsFile($reference[0] ?? '')) {
-                $item->isJs = true;
+                $item->isInJs = true;
                 break;
             }
         }
@@ -386,13 +437,45 @@ class MessageStorage
     }
 
     /**
-     * Mark all messages in the given domain and locale as disabled
+     * Check if new item is different than the old one
+     *
+     * @param MessageItem $old
+     * @param MessageItem $new
+     * @return bool
+     */
+    private function hasChanged(MessageItem $old, MessageItem $new): bool
+    {
+        // TODO implement
+        return true;
+    }
+
+    /**
+     * Set all locale and domain messages as not present in files ("isFile" and "isInJs" fields should be set to false)
      *
      * @param string $locale
      * @param string $domain
      */
-    public function disableAll(string $locale, string $domain)
+    public function setAllAsNotInFilesAndInJs(string $locale, string $domain)
     {
-        $this->repository->disableAll($locale, $domain);
+        $this->repository->setAllAsNotInFilesAndInJs($locale, $domain);
+    }
+
+    /**
+     * Set all locale and domain messages as not dynamic ("isDynamic" field should be set to false)
+     *
+     * @param string $locale
+     * @param string $domain
+     */
+    public function setAllAsNotDynamic(string $locale, string $domain)
+    {
+        $this->repository->setAllAsNotDynamic($locale, $domain);
+    }
+
+    /**
+     * Set all messages as disabled which are not used (messages which filed "isDynamic", "isInFile" and "isInJs" all are false)
+     */
+    public function disableUnused()
+    {
+        $this->repository->disableUnused();
     }
 }

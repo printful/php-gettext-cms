@@ -1,0 +1,3 @@
+<?php
+
+dgettext('domain', 'message');

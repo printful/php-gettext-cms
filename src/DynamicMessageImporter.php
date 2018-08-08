@@ -68,20 +68,18 @@ class DynamicMessageImporter
                 continue;
             }
 
-            $this->storage->disableAll($locale, $domain);
+            $this->storage->setAllAsNotDynamic($locale, $domain);
 
             foreach ($this->messages as $context => $messages) {
                 foreach ($messages as $message) {
-                    $this->storage->createOrUpdateSingle(
-                        $locale,
-                        $domain,
-                        new Translation($context, $message)
-                    );
+                    $this->storage->createOrUpdateSingleDynamic($locale, $domain, new Translation($context, $message));
                 }
             }
         }
 
-        // Clear the queue of messages to be saved so on repeated
+        $this->storage->disableUnused();
+
+        // Clear the queue of messages to be saved so on repeated calls we do not do anything
         $this->messages = [];
     }
 }

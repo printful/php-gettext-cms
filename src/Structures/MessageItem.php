@@ -92,7 +92,8 @@ class MessageItem
     public $extractedComments = [];
 
     /**
-     * Indicates if this is a JS translation.
+     * Indicates if this is a translation in JS file
+     *
      * Sometimes we have to know which translations are present in JS files
      * so we export them separately for client side usage.
      *
@@ -100,7 +101,21 @@ class MessageItem
      *
      * @var bool
      */
-    public $isJs = false;
+    public $isInJs = false;
+
+    /**
+     * Indicates if this is a dynamically created translation
+     *
+     * @var bool
+     */
+    public $isDynamic = false;
+
+    /**
+     * Indicates if this is a translation that is found in a file
+     *
+     * @var bool
+     */
+    public $isInFile = false;
 
     /**
      * If this is an existing translation that was saved to repository

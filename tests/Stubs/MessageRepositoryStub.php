@@ -62,7 +62,7 @@ class MessageRepositoryStub implements MessageRepositoryInterface
         $enabledTranslated = $this->getEnabledTranslated($locale, $domain);
 
         return array_filter($enabledTranslated, function (MessageItem $item) {
-            return $item->isJs;
+            return $item->isInJs;
         });
     }
 
@@ -83,11 +83,25 @@ class MessageRepositoryStub implements MessageRepositoryInterface
     /**
      * @inheritdoc
      */
-    public function disableAll(string $locale, string $domain)
+    public function setAllAsNotInFilesAndInJs(string $locale, string $domain)
     {
         $this->store = array_map(function (MessageItem $item) use ($locale, $domain) {
             if ($item->domain === $domain && $item->locale === $locale) {
-                $item->isDisabled = true;
+                $item->isInFile = false;
+                $item->isInJs = false;
+            }
+            return $item;
+        }, $this->store);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setAllAsNotDynamic(string $locale, string $domain)
+    {
+        $this->store = array_map(function (MessageItem $item) use ($locale, $domain) {
+            if ($item->domain === $domain && $item->locale === $locale) {
+                $item->isDynamic = false;
             }
             return $item;
         }, $this->store);
@@ -101,5 +115,16 @@ class MessageRepositoryStub implements MessageRepositoryInterface
         return array_filter($this->getEnabled($locale, $domain), function (MessageItem $item) {
             return $item->requiresTranslating;
         });
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function disableUnused()
+    {
+        $this->store = array_map(function (MessageItem $item) {
+            $item->isDisabled = !$item->isDynamic && !$item->isInJs && !$item->isInFile;
+            return $item;
+        }, $this->store);
     }
 }

@@ -47,11 +47,15 @@ class MessageImporter
             }
 
             foreach ($allDomainTranslations as $translations) {
-                // Disable all previous translations and save the new ones
-                $this->storage->disableAll($locale, $translations->getDomain());
                 $translations->setLanguage($locale);
+
+                // Set all previous translations as not in files
+                $this->storage->setAllAsNotInFilesAndInJs($locale, $translations->getDomain());
+
                 $this->storage->createOrUpdate($translations);
             }
         }
+
+        $this->storage->disableUnused();
     }
 }
