@@ -7,3 +7,6 @@
 ### TODO's
 
 * Optimize short functions so they use static variables to cache revisioned domains (metrics required)
+* MessageManager should allow access of JS builder
+* JS Builder should build all domains if no domains are given
+* When scanning files, file path references should be without aboslute patsh (project root should be defined?) 

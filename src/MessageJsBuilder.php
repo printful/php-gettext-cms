@@ -32,6 +32,10 @@ class MessageJsBuilder
         foreach ($domains as $domain) {
             $translations = $this->storage->getEnabledTranslatedJs($locale, $domain);
 
+            if (!count($translations)) {
+                continue;
+            }
+
             $jed = Jed::toString($translations);
 
             $js .= $jsonpCallback . '(' . $jed . ");\n";

@@ -33,7 +33,7 @@ class MessageRevisions
      */
     public function getRevisionedDomain(string $locale, string $domain): string
     {
-        if ($locale === $this->config->getDefaultLocale()) {
+        if ($locale === $this->config->getDefaultLocale() || !$this->config->useRevisions()) {
             // We do not revision default domain because all texts are defined in the code and not cached by gettext
             return $domain;
         }

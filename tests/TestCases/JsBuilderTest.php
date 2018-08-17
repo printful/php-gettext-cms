@@ -54,6 +54,16 @@ class JsBuilderTest extends TestCase
         }
     }
 
+    public function testEmptyDomainIsNotExported()
+    {
+        $this->locale = 'en_US';
+        $domains = ['D1'];
+
+        $js = $this->builder->exportJsonp($this->locale, $domains, 'loaded');
+
+        self::assertEmpty($js, 'JS string is empty, because domain is empty');
+    }
+
     private function add(string $domain, bool $isJs, string $original, string $translation, string $context = ''): self
     {
         $translation = (new Translation($context, $original))->setTranslation($translation);

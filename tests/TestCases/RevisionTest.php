@@ -67,6 +67,7 @@ class RevisionTest extends TestCase
         $revisions = new MessageRevisions($this->config);
 
         $this->config->shouldReceive('getMoDirectory')->andReturn($this->tempDir);
+        $this->config->shouldReceive('useRevisions')->andReturn(true);
 
         $domain = 'domain';
         $domainRevisioned = 'domain-1234';
