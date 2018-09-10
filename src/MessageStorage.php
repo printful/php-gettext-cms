@@ -14,8 +14,8 @@ use Printful\GettextCms\Structures\MessageItem;
  */
 class MessageStorage
 {
-    private const TYPE_FILE = 'file';
-    private const TYPE_DYNAMIC = 'dynamic';
+    const TYPE_FILE = 'file';
+    const TYPE_DYNAMIC = 'dynamic';
 
     /** @var MessageRepositoryInterface */
     private $repository;
