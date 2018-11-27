@@ -7,4 +7,4 @@ gettext('default-message-2');
 
 /** @noinspection PhpUndefinedFunctionInspection */
 // Extracted comment
-my_custom_function('custom function translation');
+my_custom_function('custom function translation', ['some-other-params']);
