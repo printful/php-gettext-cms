@@ -68,11 +68,41 @@ class ImporterTest extends TestCase
 
     }
 
+    public function testSaveWithoutDisableOnRepeatedSave()
+    {
+        $domain = 'default';
+        $localeDe = 'de_DE';
+        $localeEn = 'en_US';
+
+        $this->configure($localeEn, [$localeEn, $localeDe], $domain, []);
+
+        // Scan for two translations
+        $this->importer->extractAndSave([new ScanItem($this->getDummyFile('../importer/file1.php'))]);
+
+        self::assertEmpty($this->storage->getAll($localeEn, $domain), 'Default locale is not saved');
+        $allEnabled = $this->storage->getAllEnabled($localeDe, $domain);
+
+        self::assertCount(2, $allEnabled, 'German locale is saved');
+        self::assertNotFalse($allEnabled->find('', 'first'));
+        self::assertNotFalse($allEnabled->find('', 'second'));
+        // Scan for two translations where one is new and another one is missing now. Since disabling is disabled, it should find three translations
+        $this->importer->extractAndSave([new ScanItem($this->getDummyFile('../importer/file2.php'))], false);
+
+        $allEnabledAfter = $this->storage->getAllEnabled($localeDe, $domain);
+        self::assertCount(3, $allEnabledAfter, 'Tree enabled translations');
+        self::assertCount(3, $this->storage->getAll($localeDe, $domain), 'Total three translations total');
+
+        // One old translation is disabled, new translation was added
+        self::assertNotFalse($allEnabledAfter->find('', 'second'));
+        self::assertNotFalse($allEnabledAfter->find('', 'third'));
+
+    }
+
     private function configure(string $defaultLocale, array $locales, string $defaultDomain, array $otherDomains)
     {
         $this->config->shouldReceive('getDefaultLocale')->andReturn($defaultLocale)->atLeast()->once();
         $this->config->shouldReceive('getLocales')->andReturn($locales)->atLeast()->once();
-        $this->config->shouldReceive('getOtherDomains')->andReturn($otherDomains)->atLeast()->once();
+        $this->config->shouldReceive('getStaticMessageDomains')->andReturn($otherDomains)->atLeast()->once();
         $this->config->shouldReceive('getDefaultDomain')->andReturn($defaultDomain)->atLeast()->once();
     }
 }

@@ -31,9 +31,11 @@ class MessageImporter
      * Careful! Messages for each domain that were not found in this scan will be disabled.
      *
      * @param ScanItem[] $scanItems
+     * @param bool $shouldDisableUnused - if the extract should disable any messages. Used for partial scans, when you dont want to disable anything
+     * @throws Exceptions\InvalidTranslationException
      * @throws GettextCmsException
      */
-    public function extractAndSave(array $scanItems)
+    public function extractAndSave(array $scanItems, $shouldDisableUnused = true)
     {
         $defaultLocale = $this->config->getDefaultLocale();
 
@@ -50,12 +52,16 @@ class MessageImporter
                 $translations->setLanguage($locale);
 
                 // Set all previous translations as not in files
-                $this->storage->setAllAsNotInFilesAndInJs($locale, $translations->getDomain());
+                if ($shouldDisableUnused) {
+                    $this->storage->setAllAsNotInFilesAndInJs($locale, $translations->getDomain());
+                }
 
                 $this->storage->createOrUpdate($translations);
             }
         }
 
-        $this->storage->disableUnused();
+        if ($shouldDisableUnused) {
+            $this->storage->disableUnused();
+        }
     }
 }

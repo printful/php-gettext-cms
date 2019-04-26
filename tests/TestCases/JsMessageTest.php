@@ -29,7 +29,7 @@ class JsMessageTest extends TestCase
 
         $this->mockConfig = Mockery::mock(MessageConfigInterface::class);
         $this->mockConfig->shouldReceive('getDefaultDomain')->andReturn('domain')->byDefault();
-        $this->mockConfig->shouldReceive('getOtherDomains')->andReturn([])->byDefault();
+        $this->mockConfig->shouldReceive('getStaticMessageDomains')->andReturn([])->byDefault();
 
         $this->scanner = new MessageExtractor($this->mockConfig);
         $this->storage = new MessageStorage(new MessageRepositoryStub);

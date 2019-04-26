@@ -114,6 +114,6 @@ class MessageExtractionTest extends TestCase
 
     private function setOtherDomains(array $domains)
     {
-        $this->mockConfig->shouldReceive('getOtherDomains')->andReturn($domains)->byDefault();
+        $this->mockConfig->shouldReceive('getStaticMessageDomains')->andReturn($domains)->byDefault();
     }
 }

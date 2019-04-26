@@ -46,7 +46,7 @@ class MessageExtractor
     public function extract(array $items): array
     {
         $defaultDomain = $this->config->getDefaultDomain();
-        $domains = $this->config->getOtherDomains();
+        $domains = $this->config->getStaticMessageDomains();
         $domains[] = $defaultDomain;
 
         $allTranslations = [];

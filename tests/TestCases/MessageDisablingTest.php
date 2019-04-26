@@ -74,7 +74,7 @@ class MessageDisablingTest extends TestCase
         $this->config->shouldReceive('getLocales')->atLeast()->once()->andReturn([$locale]);
         $this->config->shouldReceive('getDefaultLocale')->atLeast()->once()->andReturn('en_US');
         $this->config->shouldReceive('getDefaultDomain')->andReturn('whatever-domain');
-        $this->config->shouldReceive('getOtherDomains')->andReturn([$domain]);
+        $this->config->shouldReceive('getStaticMessageDomains')->andReturn([$domain]);
 
         // This will add one static message
         $this->fileImporter->extractAndSave([new ScanItem($this->getDummyFile('../importer/domain.php'))]);
@@ -103,7 +103,7 @@ class MessageDisablingTest extends TestCase
         $this->config->shouldReceive('getLocales')->atLeast()->once()->andReturn([$locale]);
         $this->config->shouldReceive('getDefaultLocale')->atLeast()->once()->andReturn('en_US');
         $this->config->shouldReceive('getDefaultDomain')->andReturn('whatever-domain');
-        $this->config->shouldReceive('getOtherDomains')->andReturn([$domain]);
+        $this->config->shouldReceive('getStaticMessageDomains')->andReturn([$domain]);
 
         // Adds one translation "message"
         $this->fileImporter->extractAndSave([new ScanItem($this->getDummyFile('../importer/domain.php'))]);

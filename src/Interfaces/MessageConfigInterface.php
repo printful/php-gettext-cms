@@ -37,6 +37,14 @@ interface MessageConfigInterface
     public function getOtherDomains(): array;
 
     /**
+     * List of domains, that should be scanned with MessageExtractor
+     * This should not include the default domain.
+     *
+     * @return string[]
+     */
+    public function getStaticMessageDomains(): array;
+
+    /**
      * Absolute directory path where .mo translation files will be exported
      *
      * @return string

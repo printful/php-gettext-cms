@@ -58,6 +58,7 @@ class MessageManagerTest extends TestCase
         $this->config->shouldReceive('getDefaultLocale')->andReturn('en_US')->atLeast()->once();
         $this->config->shouldReceive('getLocales')->andReturn(['en_US', 'de_DE'])->atLeast()->once();
         $this->config->shouldReceive('getOtherDomains')->andReturn([$dOther, $dDynamic])->atLeast()->once();
+        $this->config->shouldReceive('getStaticMessageDomains')->andReturn([$dOther])->atLeast()->once();
         $this->config->shouldReceive('getDefaultDomain')->andReturn($dDefault)->atLeast()->once();
         $this->config->shouldReceive('getMoDirectory')->andReturn($this->tempDir)->atLeast()->once();
         $this->config->shouldReceive('useRevisions')->andReturn(true)->atLeast()->once();
