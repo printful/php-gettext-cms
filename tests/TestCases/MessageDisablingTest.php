@@ -12,6 +12,7 @@ use Printful\GettextCms\Interfaces\MessageRepositoryInterface;
 use Printful\GettextCms\MessageExtractor;
 use Printful\GettextCms\MessageImporter;
 use Printful\GettextCms\MessageStorage;
+use Printful\GettextCms\Structures\MessageItem;
 use Printful\GettextCms\Structures\ScanItem;
 use Printful\GettextCms\Tests\Stubs\MessageRepositoryStub;
 use Printful\GettextCms\Tests\TestCase;
@@ -94,7 +95,6 @@ class MessageDisablingTest extends TestCase
         self::assertCount(2, $this->storage->getAllEnabled($locale, $domain), 'Same messages are found');
     }
 
-
     public function testSameMessageIsNotDisabledIfStillPresentSomewhere()
     {
         $locale = 'lv_LV';
@@ -127,9 +127,47 @@ class MessageDisablingTest extends TestCase
 
         self::assertFalse($item->isDynamic, 'Is not dynamic, was disabled');
         self::assertTrue($item->isInFile, 'Still is in file');
-
     }
 
+    public function testOptionToNotDisableAllTranslations()
+    {
+        $locale = 'lv_LV';
+        $domain = 'domain1';
+
+        $this->config->shouldReceive('getLocales')->andReturn([$locale]);
+        $this->config->shouldReceive('getDefaultLocale')->atLeast()->once()->andReturn('en_US');
+        $this->config->shouldReceive('getDefaultDomain')->atLeast()->once()->andReturn('whatever-domain');
+
+        $unusedTranslation = new Translation('', 'Initial');
+        $unusedTranslation->setDisabled(false);
+
+        $this->storage->createOrUpdateSingle($locale, $domain, $unusedTranslation);
+
+        self::assertCount(1, $this->storage->getAllEnabled($locale, $domain));
+
+        $scanItems = [new ScanItem($this->getDummyFile('multi-domains.php', 'mixed-domains'))];
+
+        // Scan, but don't disable unused translations
+        $this->fileImporter->extractAndSave($scanItems, false, [$domain]);
+
+        $messageItem = $this->findOneByMessage($locale, $domain, $unusedTranslation->getOriginal());
+        self::assertFalse($messageItem->isDisabled, 'Initial translation was not disabled');
+        self::assertCount(3, $this->storage->getAllEnabled($locale, $domain), 'Initial translation was not disabled');
+
+        // Scan again, but this time disable unused translations
+        $this->fileImporter->extractAndSave($scanItems, true, [$domain]);
+
+        $messageItem = $this->findOneByMessage($locale, $domain, $unusedTranslation->getOriginal());
+        self::assertTrue($messageItem->isDisabled, 'Initial translation was disabled');
+        self::assertCount(2, $this->storage->getAllEnabled($locale, $domain), 'Initial translation WAS disabled');
+    }
+
+    /**
+     * @param $locale
+     * @param $domain
+     * @param $original
+     * @return MessageItem|null
+     */
     private function findOneByMessage($locale, $domain, $original)
     {
         $all = $this->repository->getAll($locale, $domain);

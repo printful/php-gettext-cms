@@ -107,6 +107,21 @@ class MessageExtractionTest extends TestCase
         self::assertCount(1, $translations, 'Only one translation was found for custom function');
     }
 
+    public function testExtractOnlySpecificDomain()
+    {
+        $translations = $this->scanner->extract([
+            new ScanItem($this->getDummyFile('multi-domains.php', 'mixed-domains')),
+        ], ['domain1', 'domain3']);
+
+        $domainsFound = array_map(function (Translations $t) {
+            return $t->getDomain() . '|' . $t->count();
+        }, $translations);
+
+        self::assertContains('domain1|2', $domainsFound, 'Domain 1 was found with two strings');
+        self::assertContains('domain3|1', $domainsFound, 'Domain 3 was found with one string');
+        self::assertCount(2, $domainsFound, 'Two domains are found in total');
+    }
+
     private function setDefaultDomain(string $domain)
     {
         $this->mockConfig->shouldReceive('getDefaultDomain')->andReturn($domain)->byDefault();

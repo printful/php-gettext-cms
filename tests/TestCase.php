@@ -25,9 +25,9 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
         $filesystem->deleteDir($childDirName);
     }
 
-    protected function getDummyFile(string $filename = 'dummy-file.php'): string
+    protected function getDummyFile(string $filename = 'dummy-file.php', string $directory = 'dummy-directory'): string
     {
-        return __DIR__ . '/assets/dummy-directory/' . $filename;
+        return __DIR__ . '/assets/' . $directory . '/' . $filename;
     }
 
     protected function tearDown()

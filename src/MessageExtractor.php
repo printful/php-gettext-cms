@@ -40,14 +40,18 @@ class MessageExtractor
 
     /**
      * @param ScanItem[] $items
+     * @param array|null $domains Force domains to scan. If null, will scan default domains.
      * @return Translations[] List of translations for each domain
      * @throws GettextCmsException
      */
-    public function extract(array $items): array
+    public function extract(array $items, array $domains = null): array
     {
         $defaultDomain = $this->config->getDefaultDomain();
-        $domains = $this->config->getOtherDomains();
-        $domains[] = $defaultDomain;
+
+        if (!$domains) {
+            $domains = $this->config->getOtherDomains();
+            $domains[] = $defaultDomain;
+        }
 
         $allTranslations = [];
 

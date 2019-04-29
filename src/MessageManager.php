@@ -110,9 +110,10 @@ class MessageManager
      * Careful, previous translations will be disabled, so everything has to be scanned at once
      *
      * @param ScanItem[] $scanItems
+     * @param bool $disableUnusedTranslations Should old, unused translations be disabled
      * @throws GettextCmsException
      */
-    public function extractAndSaveFromFiles(array $scanItems)
+    public function extractAndSaveFromFiles(array $scanItems, bool $disableUnusedTranslations = true)
     {
         if ($this->config->useShortFunctions()) {
             // If using short functions, we need to pre-fill them
@@ -131,7 +132,7 @@ class MessageManager
             new MessageExtractor($this->config)
         );
 
-        $importer->extractAndSave($scanItems);
+        $importer->extractAndSave($scanItems, $disableUnusedTranslations);
     }
 
     /**
