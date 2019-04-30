@@ -111,10 +111,14 @@ class MessageManager
      *
      * @param ScanItem[] $scanItems
      * @param bool $disableUnusedTranslations Should old, unused translations be disabled
+     * @param array|null $domains Force domains to scan. If null, will scan default domains.
      * @throws GettextCmsException
      */
-    public function extractAndSaveFromFiles(array $scanItems, bool $disableUnusedTranslations = true)
-    {
+    public function extractAndSaveFromFiles(
+        array $scanItems,
+        bool $disableUnusedTranslations = true,
+        array $domains = null
+    ) {
         if ($this->config->useShortFunctions()) {
             // If using short functions, we need to pre-fill them
             // so they are extracted too
@@ -132,7 +136,7 @@ class MessageManager
             new MessageExtractor($this->config)
         );
 
-        $importer->extractAndSave($scanItems, $disableUnusedTranslations);
+        $importer->extractAndSave($scanItems, $disableUnusedTranslations, $domains);
     }
 
     /**
