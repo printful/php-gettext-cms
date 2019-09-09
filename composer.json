@@ -25,6 +25,9 @@
             "Printful\\GettextCms\\Tests\\": "tests/"
         }
     },
+    "scripts": {
+        "test": "phpunit"
+    },
     "repositories": [
         {
             "type": "git",
