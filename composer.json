@@ -7,11 +7,11 @@
         "ext-json": "*",
         "ext-zip": "*",
         "ext-gettext": "*",
-        "gettext/gettext": "^4.6.0",
+        "gettext/gettext": "dev-multiple-domain-scan",
         "league/flysystem": "^1.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^6.0",
+        "phpunit/phpunit": "^6.4",
         "mockery/mockery": "^1.1",
         "mikey179/vfsStream": "^1.6"
     },
@@ -25,5 +25,11 @@
             "Printful\\GettextCms\\Tests\\": "tests/"
         }
     },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/briedis/Gettext.git"
+        }
+    ],
     "minimum-stability": "stable"
 }

@@ -2,7 +2,8 @@
 
 namespace Printful\GettextCms;
 
-use Gettext\Extractors\Extractor;
+use Gettext\Extractors\ExtractorInterface;
+use Gettext\Extractors\ExtractorMultiInterface;
 use Gettext\Extractors\JsCode;
 use Gettext\Extractors\PhpCode;
 use Gettext\Extractors\VueJs;
@@ -53,9 +54,8 @@ class MessageExtractor
             $domains[] = $defaultDomain;
         }
 
-        $allTranslations = [];
-
-        foreach ($domains as $domain) {
+        /** @var Translations[] $allTranslations [domain => translations, ...] */
+        $allTranslations = array_reduce($domains, function (&$carry, string $domain) use ($defaultDomain) {
             $translations = new Translations;
 
             // When we scan for default domain, we have to specify an empty value
@@ -66,28 +66,33 @@ class MessageExtractor
                 $translations->setDomain($domain);
             }
 
-            foreach ($items as $item) {
-                // Scan for this item, translations will be merged with all domain translations
-                $this->extractForDomain($item, $translations);
-            }
+            $carry[$domain] = $translations;
 
-            // Always set the domain even if it is the default one
-            $translations->setDomain($domain);
+            return $carry;
+        }, []);
 
-            $allTranslations[] = $translations;
+        foreach ($items as $item) {
+            // Scan for this item, translations will be merged with all domain translations
+            $this->extractForDomains($item, array_values($allTranslations));
         }
 
-        return $allTranslations;
+        // Always set the domain even if it is the default one
+        // This is needed because default domain won't be set for the translations instance
+        foreach ($allTranslations as $domain => $translations) {
+            $translations->setDomain($domain);
+        }
+
+        return array_values($allTranslations);
     }
 
     /**
      * @param ScanItem $scanItem
-     * @param Translations $translations
-     * @return Translations
+     * @param Translations[] $translations
+     * @return Translations[]
      * @throws InvalidPathException
      * @throws UnknownExtractorException
      */
-    private function extractForDomain(ScanItem $scanItem, Translations $translations): Translations
+    private function extractForDomains(ScanItem $scanItem, array $translations): array
     {
         $pathnames = $this->resolvePathnames($scanItem);
 
@@ -101,24 +106,23 @@ class MessageExtractor
 
     /**
      * @param $pathname
-     * @param Translations $translations
+     * @param Translations[] $translations
      * @param array|null $functions Optional functions to scan for
      * @throws UnknownExtractorException
      */
-    private function extractFileMessages($pathname, Translations $translations, array $functions = null)
+    private function extractFileMessages($pathname, array $translations, array $functions = null)
     {
         $extractor = $this->getExtractor($pathname);
 
         $options = [
             'extractComments' => '', // This extracts comments above function call
-            'domainOnly' => $translations->hasDomain(), // We scan for messages that match our needed domain only
         ];
 
         if ($functions) {
             $options['functions'] = $functions;
         }
 
-        $extractor::fromFile($pathname, $translations, $options);
+        $extractor::fromFileMultiple($pathname, $translations, $options);
     }
 
     /**
@@ -172,7 +176,7 @@ class MessageExtractor
 
     /**
      * @param string $pathname Full path to file
-     * @return Extractor|string Name of the extraction class for the given file
+     * @return ExtractorInterface|ExtractorMultiInterface|string Name of the extraction class for the given file
      * @throws UnknownExtractorException
      */
     private function getExtractor($pathname): string

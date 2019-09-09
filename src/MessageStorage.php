@@ -5,6 +5,7 @@ namespace Printful\GettextCms;
 use Gettext\Languages\Language;
 use Gettext\Translation;
 use Gettext\Translations;
+use InvalidArgumentException;
 use Printful\GettextCms\Exceptions\InvalidTranslationException;
 use Printful\GettextCms\Interfaces\MessageRepositoryInterface;
 use Printful\GettextCms\Structures\MessageItem;
@@ -232,7 +233,7 @@ class MessageStorage
      *
      * @param string $locale
      * @return int
-     * @throws \InvalidArgumentException Thrown in the locale is not correct
+     * @throws InvalidArgumentException Thrown in the locale is not correct
      */
     private function getPluralCount(string $locale): int
     {
