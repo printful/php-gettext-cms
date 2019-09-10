@@ -7,7 +7,7 @@
         "ext-json": "*",
         "ext-zip": "*",
         "ext-gettext": "*",
-        "gettext/gettext": "dev-multiple-domain-scan",
+        "gettext/gettext": "v4.5.0",
         "league/flysystem": "^1.0"
     },
     "require-dev": {
