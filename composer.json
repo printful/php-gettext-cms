@@ -3,17 +3,17 @@
     "description": "CMS backend for Gettext translation management",
     "type": "library",
     "require": {
-        "php": ">=7.0",
+        "php": ">=7.1",
         "ext-json": "*",
         "ext-zip": "*",
         "ext-gettext": "*",
-        "gettext/gettext": "^4.6.0",
+        "gettext/gettext": "^4.7.0",
         "league/flysystem": "^1.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^6.0",
+        "phpunit/phpunit": "^6.4",
         "mockery/mockery": "^1.1",
-        "mikey179/vfsStream": "^1.6"
+        "mikey179/vfsstream": "^1.6"
     },
     "autoload": {
         "psr-4": {
@@ -24,6 +24,9 @@
         "psr-4": {
             "Printful\\GettextCms\\Tests\\": "tests/"
         }
+    },
+    "scripts": {
+        "test": "phpunit"
     },
     "minimum-stability": "stable"
 }
