@@ -7,7 +7,7 @@
         "ext-json": "*",
         "ext-zip": "*",
         "ext-gettext": "*",
-        "gettext/gettext": "dev-master",
+        "gettext/gettext": "^4.7.0",
         "league/flysystem": "^1.0"
     },
     "require-dev": {
