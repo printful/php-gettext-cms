@@ -11,6 +11,16 @@ class MessageArrayRepository implements MessageRepositoryInterface
     private $store = [];
 
     /**
+     * Retrieve all items in repository
+     *
+     * @return MessageItem[]
+     */
+    public function getItems(): array
+    {
+        return $this->store;
+    }
+
+    /**
      * @inheritdoc
      */
     public function save(MessageItem $item): bool
