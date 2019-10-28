@@ -26,7 +26,10 @@ class MessageManager
     /** @var MessageStorage */
     private $storage;
 
-    private function __construct(MessageConfigInterface $config)
+    /**
+     * @param MessageConfigInterface $config
+     */
+    public function __construct(MessageConfigInterface $config)
     {
         $this->revisions = new MessageRevisions($config);
         $this->loader = new LocaleLoader($config, new MessageRevisions($config));
@@ -78,14 +81,14 @@ class MessageManager
     /**
      * Declare helper functions for easier gettext usage
      *
-     * @see _n()
+     * @return MessageManager
+     *
      * @see _d()
      * @see _x()
      * @see _dn()
      * @see _dx()
      * @see _dxn()
-     *
-     * @return MessageManager
+     * @see _n()
      */
     private function declareFunctions(): self
     {
