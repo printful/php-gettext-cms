@@ -8,9 +8,9 @@ use Gettext\Translations;
 use Mockery;
 use Mockery\Mock;
 use Printful\GettextCms\Interfaces\MessageConfigInterface;
+use Printful\GettextCms\MessageArrayRepository;
 use Printful\GettextCms\MessageManager;
 use Printful\GettextCms\Structures\ScanItem;
-use Printful\GettextCms\Tests\Stubs\MessageRepositoryStub;
 use Printful\GettextCms\Tests\TestCase;
 
 class MessageManagerTest extends TestCase
@@ -62,7 +62,7 @@ class MessageManagerTest extends TestCase
         $this->config->shouldReceive('getMoDirectory')->andReturn($this->tempDir)->atLeast()->once();
         $this->config->shouldReceive('useRevisions')->andReturn(true)->atLeast()->once();
         $this->config->shouldReceive('useShortFunctions')->andReturn(true)->atLeast()->once();
-        $this->config->shouldReceive('getRepository')->andReturn(new MessageRepositoryStub)->atLeast()->once();
+        $this->config->shouldReceive('getRepository')->andReturn(new MessageArrayRepository())->atLeast()->once();
 
         $manager = MessageManager::init($this->config);
 

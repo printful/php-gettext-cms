@@ -117,7 +117,7 @@ class MessageRevisions
             return RevisionItem::fromArray(json_decode(file_get_contents($pathname), true));
         }
 
-        return new RevisionItem;
+        return new RevisionItem();
     }
 
     /**

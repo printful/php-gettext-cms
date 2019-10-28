@@ -31,11 +31,11 @@ class DynamicMessageImporter
      * Add message to the message queue to be saved.
      * Save has to be called to save all the translations to the repository
      *
-     * @see \Printful\GettextCms\Structures\DynamicMessageImporter::saveAndDisabledPrevious
-     *
      * @param string $original
      * @param string $context
      * @return DynamicMessageImporter
+     *
+     * @see \Printful\GettextCms\Structures\DynamicMessageImporter::saveAndDisabledPrevious
      */
     public function add(string $original, string $context = ''): DynamicMessageImporter
     {

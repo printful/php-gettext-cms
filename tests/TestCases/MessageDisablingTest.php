@@ -9,12 +9,12 @@ use Mockery\Mock;
 use Printful\GettextCms\DynamicMessageImporter;
 use Printful\GettextCms\Interfaces\MessageConfigInterface;
 use Printful\GettextCms\Interfaces\MessageRepositoryInterface;
+use Printful\GettextCms\MessageArrayRepository;
 use Printful\GettextCms\MessageExtractor;
 use Printful\GettextCms\MessageImporter;
 use Printful\GettextCms\MessageStorage;
 use Printful\GettextCms\Structures\MessageItem;
 use Printful\GettextCms\Structures\ScanItem;
-use Printful\GettextCms\Tests\Stubs\MessageRepositoryStub;
 use Printful\GettextCms\Tests\TestCase;
 
 class MessageDisablingTest extends TestCase
@@ -39,7 +39,7 @@ class MessageDisablingTest extends TestCase
         parent::setUp();
 
         $this->config = Mockery::mock(MessageConfigInterface::class);
-        $this->repository = new MessageRepositoryStub;
+        $this->repository = new MessageArrayRepository();
         $this->storage = new MessageStorage($this->repository);
         $this->dynamicImporter = new DynamicMessageImporter($this->config, $this->storage);
         $this->fileImporter = new MessageImporter($this->config, $this->storage, new MessageExtractor($this->config));

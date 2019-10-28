@@ -10,8 +10,8 @@ use Printful\GettextCms\Exceptions\UnsupportedDomainException;
 use Printful\GettextCms\Exceptions\UnsupportedLocaleException;
 use Printful\GettextCms\Interfaces\MessageConfigInterface;
 use Printful\GettextCms\Interfaces\MessageRepositoryInterface;
+use Printful\GettextCms\MessageArrayRepository;
 use Printful\GettextCms\MessageStorage;
-use Printful\GettextCms\Tests\Stubs\MessageRepositoryStub;
 use Printful\GettextCms\Tests\TestCase;
 use Printful\GettextCms\TranslatedMessageImporter;
 
@@ -33,7 +33,7 @@ class TranslationSavingTest extends TestCase
     {
         parent::setUp();
 
-        $this->repository = new MessageRepositoryStub;
+        $this->repository = new MessageArrayRepository();
         $this->storage = new MessageStorage($this->repository);
         $this->config = Mockery::mock(MessageConfigInterface::class);
         $this->importer = new TranslatedMessageImporter($this->config, $this->storage);
@@ -41,7 +41,7 @@ class TranslationSavingTest extends TestCase
 
     public function testFailWithUnknownDomain()
     {
-        $ts = (new Translations)->setDomain('unknown-domain')->setLanguage('en_US');
+        $ts = (new Translations())->setDomain('unknown-domain')->setLanguage('en_US');
         $this->configure('en_US', 'default', []);
 
         self::expectException(UnsupportedDomainException::class);
@@ -50,7 +50,7 @@ class TranslationSavingTest extends TestCase
 
     public function testFailWithUnknownLocale()
     {
-        $ts = (new Translations)->setDomain('default')->setLanguage('en_US');
+        $ts = (new Translations())->setDomain('default')->setLanguage('en_US');
         $this->configure('de_DE', 'default', []);
 
         self::expectException(UnsupportedLocaleException::class);
@@ -64,7 +64,7 @@ class TranslationSavingTest extends TestCase
 
         $this->configure($locale, $domain, []);
 
-        $ts = (new Translations)->setDomain($domain)->setLanguage($locale);
+        $ts = (new Translations())->setDomain($domain)->setLanguage($locale);
         $t = $ts->insert('', 'O1');
 
         $this->storage->createOrUpdate($ts);
@@ -86,7 +86,7 @@ class TranslationSavingTest extends TestCase
 
         $this->configure($locale, $domain, []);
 
-        $ts = (new Translations)->setDomain($domain)->setLanguage($locale);
+        $ts = (new Translations())->setDomain($domain)->setLanguage($locale);
         $t = $ts->insert('', 'O1', 'P1')->setTranslation('P1');
 
         $this->storage->createOrUpdate($ts);

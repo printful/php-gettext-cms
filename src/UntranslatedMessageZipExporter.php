@@ -39,7 +39,7 @@ class UntranslatedMessageZipExporter
             throw new InvalidArgumentException('Directory does not exist: ' . $dir);
         }
 
-        $zip = new ZipArchive;
+        $zip = new ZipArchive();
         $zip->open($zipPathname, ZipArchive::CREATE);
 
         if (empty($domains)) {

@@ -13,10 +13,10 @@ use org\bovigo\vfs\vfsStreamDirectory;
 use Printful\GettextCms\Exceptions\InvalidPathException;
 use Printful\GettextCms\Interfaces\MessageConfigInterface;
 use Printful\GettextCms\Interfaces\MessageRepositoryInterface;
+use Printful\GettextCms\MessageArrayRepository;
 use Printful\GettextCms\MessageBuilder;
 use Printful\GettextCms\MessageRevisions;
 use Printful\GettextCms\MessageStorage;
-use Printful\GettextCms\Tests\Stubs\MessageRepositoryStub;
 use Printful\GettextCms\Tests\TestCase;
 
 class BuilderTest extends TestCase
@@ -61,7 +61,7 @@ class BuilderTest extends TestCase
 
         $this->config->shouldReceive('useRevisions')->andReturn(false)->byDefault();
 
-        $this->repository = new MessageRepositoryStub;
+        $this->repository = new MessageArrayRepository();
         $this->revisions = new MessageRevisions($this->config);
         $this->storage = new MessageStorage($this->repository);
 
@@ -164,7 +164,7 @@ class BuilderTest extends TestCase
 
     private function verifyTranslations(array $messages, string $locale, string $domain, string $moPathname)
     {
-        $translations = new Translations;
+        $translations = new Translations();
         Mo::fromFile($moPathname, $translations);
 
         self::assertEquals($locale, $translations->getLanguage(), 'Locale matches');

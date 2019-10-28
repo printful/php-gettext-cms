@@ -299,7 +299,7 @@ class MessageStorage
      */
     private function translationToItem(string $locale, string $domain, Translation $translation): MessageItem
     {
-        $item = new MessageItem;
+        $item = new MessageItem();
 
         $item->key = $this->getKey($locale, $domain, $translation);
         $item->domain = $domain;
@@ -425,7 +425,7 @@ class MessageStorage
     {
         $domain = (string)$domain;
 
-        $translations = new Translations;
+        $translations = new Translations();
         $translations->setDomain($domain);
         $translations->setLanguage($locale);
 

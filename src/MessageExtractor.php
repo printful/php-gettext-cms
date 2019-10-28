@@ -56,7 +56,7 @@ class MessageExtractor
 
         /** @var Translations[] $allTranslations [domain => translations, ...] */
         $allTranslations = array_reduce($domains, function (&$carry, string $domain) use ($defaultDomain) {
-            $translations = new Translations;
+            $translations = new Translations();
 
             // When we scan for default domain, we have to specify an empty value
             // otherwise we would search for domain function calls with this domain
@@ -157,7 +157,7 @@ class MessageExtractor
 
         $adapter = new Local($dir);
         $filesystem = new Filesystem($adapter);
-        $filesystem->addPlugin(new ListFiles);
+        $filesystem->addPlugin(new ListFiles());
 
         $files = $filesystem->listFiles('', $item->recursive);
 

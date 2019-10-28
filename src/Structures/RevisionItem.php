@@ -55,7 +55,7 @@ class RevisionItem
      */
     public static function fromArray($revisions): RevisionItem
     {
-        $instance = new self;
+        $instance = new self();
         $instance->revisions = $revisions;
 
         return $instance;
