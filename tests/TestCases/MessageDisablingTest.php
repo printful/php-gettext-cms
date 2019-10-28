@@ -65,6 +65,7 @@ class MessageDisablingTest extends TestCase
         self::assertNotFalse($translations->find('', 'Static'), 'Static was found');
         self::assertNotFalse($translations->find('', 'Dynamic 2'), 'Static was found');
         self::assertCount(2, $translations);
+        self::assertCount(3, $this->repository->getItems(), 'Three items exist in total');
     }
 
     public function testDynamicMessageIsNotDisabledAfterStaticScan()
