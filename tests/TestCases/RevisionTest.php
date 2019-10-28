@@ -45,7 +45,7 @@ class RevisionTest extends TestCase
     {
         $revisions = new MessageRevisions($this->config);
 
-        $ts = new Translations;
+        $ts = new Translations();
         $t = (new Translation('ctx', 'O'))->setTranslation('T');
         $ts[] = $t;
 

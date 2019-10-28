@@ -7,8 +7,8 @@ namespace Printful\GettextCms\Tests\TestCases;
 use Gettext\Translation;
 use Gettext\Translations;
 use Printful\GettextCms\Interfaces\MessageRepositoryInterface;
+use Printful\GettextCms\MessageArrayRepository;
 use Printful\GettextCms\MessageStorage;
-use Printful\GettextCms\Tests\Stubs\MessageRepositoryStub;
 use Printful\GettextCms\Tests\TestCase;
 use Printful\GettextCms\UntranslatedMessageExporter;
 
@@ -36,7 +36,7 @@ class UntranslatedExportTest extends TestCase
         $this->domain = 'test';
         $this->locale = 'lv_LV';
 
-        $this->repository = new MessageRepositoryStub;
+        $this->repository = new MessageArrayRepository();
         $this->storage = new MessageStorage($this->repository);
         $this->exporter = new UntranslatedMessageExporter($this->storage);
     }

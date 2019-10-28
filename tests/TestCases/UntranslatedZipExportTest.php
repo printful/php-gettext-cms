@@ -9,8 +9,8 @@ use Mockery;
 use Mockery\Mock;
 use Printful\GettextCms\Interfaces\MessageConfigInterface;
 use Printful\GettextCms\Interfaces\MessageRepositoryInterface;
+use Printful\GettextCms\MessageArrayRepository;
 use Printful\GettextCms\MessageStorage;
-use Printful\GettextCms\Tests\Stubs\MessageRepositoryStub;
 use Printful\GettextCms\Tests\TestCase;
 use Printful\GettextCms\UntranslatedMessageExporter;
 use Printful\GettextCms\UntranslatedMessageZipExporter;
@@ -46,7 +46,7 @@ class UntranslatedZipExportTest extends TestCase
         $this->domainOther = 'domain2';
         $this->locale = 'en_US';
 
-        $this->repository = new MessageRepositoryStub;
+        $this->repository = new MessageArrayRepository();
         $this->storage = new MessageStorage($this->repository);
         $this->config = Mockery::mock(MessageConfigInterface::class);
 
@@ -81,7 +81,7 @@ class UntranslatedZipExportTest extends TestCase
 
         self::assertFileExists($this->zipPathname, 'Zip file exists');
 
-        $zip = new ZipArchive;
+        $zip = new ZipArchive();
         $zip->open($this->zipPathname);
 
         self::assertEquals(2, $zip->numFiles, 'Two domain files in zip');

@@ -6,10 +6,10 @@ use Gettext\Translation;
 use Gettext\Translations;
 use Mockery;
 use Printful\GettextCms\Interfaces\MessageConfigInterface;
+use Printful\GettextCms\MessageArrayRepository;
 use Printful\GettextCms\MessageExtractor;
 use Printful\GettextCms\MessageStorage;
 use Printful\GettextCms\Structures\ScanItem;
-use Printful\GettextCms\Tests\Stubs\MessageRepositoryStub;
 use Printful\GettextCms\Tests\TestCase;
 
 class JsMessageTest extends TestCase
@@ -32,7 +32,7 @@ class JsMessageTest extends TestCase
         $this->mockConfig->shouldReceive('getOtherDomains')->andReturn([])->byDefault();
 
         $this->scanner = new MessageExtractor($this->mockConfig);
-        $this->storage = new MessageStorage(new MessageRepositoryStub);
+        $this->storage = new MessageStorage(new MessageArrayRepository());
     }
 
     public function testExtract()

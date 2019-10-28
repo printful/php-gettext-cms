@@ -3,9 +3,9 @@
 namespace Printful\GettextCms\Tests\TestCases;
 
 use Gettext\Translation;
+use Printful\GettextCms\MessageArrayRepository;
 use Printful\GettextCms\MessageJsBuilder;
 use Printful\GettextCms\MessageStorage;
-use Printful\GettextCms\Tests\Stubs\MessageRepositoryStub;
 use Printful\GettextCms\Tests\TestCase;
 
 class JsBuilderTest extends TestCase
@@ -22,7 +22,7 @@ class JsBuilderTest extends TestCase
     {
         parent::setUp();
 
-        $this->storage = new MessageStorage(new MessageRepositoryStub);
+        $this->storage = new MessageStorage(new MessageArrayRepository());
         $this->builder = new MessageJSBuilder($this->storage);
     }
 

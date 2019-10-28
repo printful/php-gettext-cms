@@ -1,5 +1,6 @@
 <?php
 /** @noinspection PhpUnhandledExceptionInspection */
+
 /** @noinspection SpellCheckingInspection */
 
 namespace Printful\GettextCms\Tests\TestCases;
@@ -8,8 +9,8 @@ use Gettext\Translation;
 use Gettext\Translations;
 use Printful\GettextCms\Exceptions\InvalidTranslationException;
 use Printful\GettextCms\Interfaces\MessageRepositoryInterface;
+use Printful\GettextCms\MessageArrayRepository;
 use Printful\GettextCms\MessageStorage;
-use Printful\GettextCms\Tests\Stubs\MessageRepositoryStub;
 use Printful\GettextCms\Tests\TestCase;
 
 class StorageTest extends TestCase
@@ -24,14 +25,14 @@ class StorageTest extends TestCase
     {
         parent::setUp();
 
-        $this->repository = new MessageRepositoryStub;
+        $this->repository = new MessageArrayRepository();
 
         $this->storage = new MessageStorage($this->repository);
     }
 
     public function testSaveAndGetItems()
     {
-        $translations = new Translations;
+        $translations = new Translations();
         $translations->setLanguage('lv_LV');
         $translations->setDomain('my-domain');
 
@@ -55,7 +56,7 @@ class StorageTest extends TestCase
 
     public function testMergeTranslationWithExistingDisabledOne()
     {
-        $translations = (new Translations)
+        $translations = (new Translations())
             ->setLanguage('lv_LV')
             ->setDomain('domain');
 
@@ -71,7 +72,7 @@ class StorageTest extends TestCase
             ->setDisabled(false)// Found again, but now enabled
             ->setTranslation(''); // Remove translation
 
-        $newTranslations = (new Translations)
+        $newTranslations = (new Translations())
             ->setLanguage('lv_LV')
             ->setDomain('domain');
         $newTranslations[] = $t2;
@@ -92,7 +93,7 @@ class StorageTest extends TestCase
         $locale = 'lv_LV';
         $domain = 'domain';
 
-        $translations = (new Translations)->setLanguage($locale)->setDomain($domain);
+        $translations = (new Translations())->setLanguage($locale)->setDomain($domain);
 
         $translations->insert('', 'O1')->setTranslation('T1');
         $translations->insert('', 'O2'); // Untranslated
@@ -111,7 +112,7 @@ class StorageTest extends TestCase
 
     public function testMissingPluralTranslation()
     {
-        $t = (new Translations)->setLanguage('lv_LV')->setDomain('domain');
+        $t = (new Translations())->setLanguage('lv_LV')->setDomain('domain');
         $t->insert('', 'O1', 'P1')->setTranslation('T1'); // Plural is not translated
 
         $this->storage->createOrUpdate($t);
@@ -125,14 +126,14 @@ class StorageTest extends TestCase
 
     public function testPreventSavingWithoutLocale()
     {
-        $translations = (new Translations)->setDomain('domain');
+        $translations = (new Translations())->setDomain('domain');
         self::expectException(InvalidTranslationException::class);
         $this->storage->createOrUpdate($translations);
     }
 
     public function testPreventSavingWithoutDomain()
     {
-        $translations = (new Translations)->setLanguage('en_US');
+        $translations = (new Translations())->setLanguage('en_US');
         self::expectException(InvalidTranslationException::class);
         $this->storage->createOrUpdate($translations);
     }

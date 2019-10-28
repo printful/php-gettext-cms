@@ -6,11 +6,11 @@ namespace Printful\GettextCms\Tests\TestCases;
 use Mockery;
 use Mockery\Mock;
 use Printful\GettextCms\Interfaces\MessageConfigInterface;
+use Printful\GettextCms\MessageArrayRepository;
 use Printful\GettextCms\MessageExtractor;
 use Printful\GettextCms\MessageImporter;
 use Printful\GettextCms\MessageStorage;
 use Printful\GettextCms\Structures\ScanItem;
-use Printful\GettextCms\Tests\Stubs\MessageRepositoryStub;
 use Printful\GettextCms\Tests\TestCase;
 
 class ImporterTest extends TestCase
@@ -32,7 +32,7 @@ class ImporterTest extends TestCase
         parent::setUp();
 
         $this->config = Mockery::mock(MessageConfigInterface::class);
-        $this->storage = new MessageStorage(new MessageRepositoryStub);
+        $this->storage = new MessageStorage(new MessageArrayRepository());
         $this->extractor = new MessageExtractor($this->config);
         $this->importer = new MessageImporter($this->config, $this->storage, $this->extractor);
     }

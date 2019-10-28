@@ -9,10 +9,10 @@ use Mockery\Mock;
 use Printful\GettextCms\Exceptions\UnsupportedLocaleException;
 use Printful\GettextCms\Interfaces\MessageConfigInterface;
 use Printful\GettextCms\LocaleLoader;
+use Printful\GettextCms\MessageArrayRepository;
 use Printful\GettextCms\MessageBuilder;
 use Printful\GettextCms\MessageRevisions;
 use Printful\GettextCms\MessageStorage;
-use Printful\GettextCms\Tests\Stubs\MessageRepositoryStub;
 use Printful\GettextCms\Tests\TestCase;
 
 /**
@@ -46,12 +46,12 @@ class LocaleLoaderTest extends TestCase
         $this->dir = realpath(__DIR__ . '/../assets/temp') . '/generated-translations';
 
         $this->config = Mockery::mock(MessageConfigInterface::class);
-        
+
         // Set a fake default locale so all tests will work as if their locale is not the default
         $this->config->shouldReceive('getDefaultLocale')->andReturn('xx_XX');
         $this->config->shouldReceive('getMoDirectory')->andReturn($this->dir);
 
-        $this->storage = new MessageStorage(new MessageRepositoryStub);
+        $this->storage = new MessageStorage(new MessageArrayRepository());
         $this->revisions = new MessageRevisions($this->config);
         $this->builder = new MessageBuilder($this->config, $this->storage, $this->revisions);
         $this->loader = new LocaleLoader($this->config, $this->revisions);

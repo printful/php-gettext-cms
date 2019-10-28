@@ -8,8 +8,8 @@ use Mockery\Mock;
 use Printful\GettextCms\DynamicMessageImporter;
 use Printful\GettextCms\Exceptions\MissingMessagesException;
 use Printful\GettextCms\Interfaces\MessageConfigInterface;
+use Printful\GettextCms\MessageArrayRepository;
 use Printful\GettextCms\MessageStorage;
-use Printful\GettextCms\Tests\Stubs\MessageRepositoryStub;
 use Printful\GettextCms\Tests\TestCase;
 
 class DynamicImporterTest extends TestCase
@@ -28,7 +28,7 @@ class DynamicImporterTest extends TestCase
         parent::setUp();
 
         $this->mockConfig = Mockery::mock(MessageConfigInterface::class);
-        $this->storage = new MessageStorage(new MessageRepositoryStub);
+        $this->storage = new MessageStorage(new MessageArrayRepository());
         $this->importer = new DynamicMessageImporter($this->mockConfig, $this->storage);
     }
 

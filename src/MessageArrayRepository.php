@@ -1,11 +1,11 @@
 <?php
 
-namespace Printful\GettextCms\Tests\Stubs;
+namespace Printful\GettextCms;
 
 use Printful\GettextCms\Interfaces\MessageRepositoryInterface;
 use Printful\GettextCms\Structures\MessageItem;
 
-class MessageRepositoryStub implements MessageRepositoryInterface
+class MessageArrayRepository implements MessageRepositoryInterface
 {
     /** @var MessageItem[] */
     private $store = [];
@@ -77,7 +77,7 @@ class MessageRepositoryStub implements MessageRepositoryInterface
             }
         }
 
-        return new MessageItem;
+        return new MessageItem();
     }
 
     /**
