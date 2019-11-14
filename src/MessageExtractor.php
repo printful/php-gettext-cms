@@ -166,7 +166,7 @@ class MessageExtractor
 
         // If extensions are set, filter other files out
         $files = array_filter($files, function ($file) use ($item, $extensions) {
-            return in_array($file['extension'], $extensions);
+            return isset($file['extension']) && in_array($file['extension'], $extensions);
         });
 
         return array_map(function ($file) use ($dir) {
