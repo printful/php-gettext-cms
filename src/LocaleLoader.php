@@ -61,16 +61,20 @@ class LocaleLoader
             $locale . '.UTF-8',
         ];
 
-        foreach ($locales as $v) {
-            foreach (self::LC_CATEGORIES_TO_OVERRIDE as $lc) {
-                if (!setlocale($lc, $v)) {
-                    return false;
+        foreach (self::LC_CATEGORIES_TO_OVERRIDE as $lc) {
+            $wasFound = false;
+            foreach ($locales as $v) {
+                if (setlocale($lc, $v)) {
+                    $wasFound = true;
+                    break;
                 }
-                return true;
+            }
+            if (!$wasFound) {
+                return false;
             }
         }
 
-        return false;
+        return true;
     }
 
     /**
