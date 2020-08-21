@@ -16,9 +16,7 @@ class LocaleLoader
      */
     const LC_CATEGORIES_TO_OVERRIDE = [
         LC_MESSAGES,
-        LC_COLLATE,
         LC_TIME,
-        LC_CTYPE,
     ];
 
     /** @var MessageConfigInterface */
