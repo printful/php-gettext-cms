@@ -10,6 +10,15 @@ use Printful\GettextCms\Interfaces\MessageConfigInterface;
  */
 class LocaleLoader
 {
+    /**
+     * Available categories are defined here
+     * @url https://www.php.net/manual/en/function.setlocale.php
+     */
+    const LC_CATEGORIES_TO_OVERRIDE = [
+        LC_MESSAGES,
+        LC_TIME,
+    ];
+
     /** @var MessageConfigInterface */
     private $config;
 
@@ -52,13 +61,20 @@ class LocaleLoader
             $locale . '.UTF-8',
         ];
 
-        foreach ($locales as $v) {
-            if (setlocale(LC_ALL, $v)) {
-                return true;
+        foreach (self::LC_CATEGORIES_TO_OVERRIDE as $lc) {
+            $wasFound = false;
+            foreach ($locales as $v) {
+                if (setlocale($lc, $v)) {
+                    $wasFound = true;
+                    break;
+                }
+            }
+            if (!$wasFound) {
+                return false;
             }
         }
 
-        return false;
+        return true;
     }
 
     /**

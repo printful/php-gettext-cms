@@ -204,6 +204,17 @@ class LocaleLoaderTest extends TestCase
         self::assertFalse($this->loader->load('en_US'), 'Binding fails because dir does not exist');
     }
 
+    public function tests()
+    {
+        $this->setConfig('whatever');
+
+        self::assertEquals('1.23', (string)1.23);
+
+        $this->loader->load('es_ES');
+
+        self::assertEquals('1.23', (string)1.23, 'Floats are not localized');
+    }
+
     private function getRevDomain($locale, $domain): string
     {
         return $this->revisions->getRevisionedDomain($locale, $domain);
