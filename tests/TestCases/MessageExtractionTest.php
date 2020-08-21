@@ -37,25 +37,32 @@ class MessageExtractionTest extends TestCase
     {
         self::expectException(UnknownExtractorException::class);
 
-        $this->scanner->extract([
-            new ScanItem(__DIR__ . '/../assets/dummy-directory/sub-directory/text-file.txt', ['txt']),
-        ]);
+        $this->scanner->extract(
+            [
+                new ScanItem(__DIR__ . '/../assets/dummy-directory/sub-directory/text-file.txt', ['txt']),
+            ]
+        );
     }
 
     public function testExtractDefaultDomain()
     {
-        $allTranslations = $this->scanner->extract([
-            new ScanItem($this->getDummyFile()),
-        ]);
+        $allTranslations = $this->scanner->extract(
+            [
+                new ScanItem($this->getDummyFile()),
+            ]
+        );
 
         $translations = array_pop($allTranslations);
 
         self::assertEquals(2, $translations->count(), 'Scanned message count matches');
         self::assertEquals(self::DOMAIN_DEFAULT, $translations->getDomain(), 'Domain is empty');
 
-        $messages = array_map(function (Translation $t) {
-            return $t->getOriginal();
-        }, (array)$translations);
+        $messages = array_map(
+            function (Translation $t) {
+                return $t->getOriginal();
+            },
+            (array)$translations
+        );
 
         sort($messages);
 
@@ -78,25 +85,31 @@ class MessageExtractionTest extends TestCase
         self::assertCount(2, $allTranslations, 'Two domains scanned, default and custom');
 
         // Find translation for our domain
-        /** @var Translations|Translation[] $translations */
-        $translations = array_reduce($allTranslations, function (&$carry, Translations $t) use ($domain) {
-            if ($t->getDomain() === $domain) {
-                return $t;
+        /** @var Translations $domainTranslations */
+        $domainTranslations = null;
+
+        foreach ($allTranslations as $v) {
+            if ($v->getDomain() === $domain) {
+                $domainTranslations = $v;
             }
-            return $carry;
-        }, null);
+        }
 
-        self::assertEquals(1, $translations->count(), 'One message exists');
+        self::assertEquals(1, $domainTranslations->count(), 'One message exists');
 
-        self::assertEquals($domain, $translations->getDomain(), 'Domain matches');
-        self::assertContains('custom-domain-message', reset($translations)->getOriginal(), 'Domain message is present');
+        self::assertEquals($domain, $domainTranslations->getDomain(), 'Domain matches');
+
+        $message = $domainTranslations->find('', 'custom-domain-message');
+
+        self::assertInstanceOf(Translation::class, $message, 'Message was found');
     }
 
     public function testExtractSpecificFunctions()
     {
-        $allTranslations = $this->scanner->extract([
-            new ScanItem($this->getDummyFile(), null, true, ['my_custom_function' => 'gettext']),
-        ]);
+        $allTranslations = $this->scanner->extract(
+            [
+                new ScanItem($this->getDummyFile(), null, true, ['my_custom_function' => 'gettext']),
+            ]
+        );
 
         $translations = array_shift($allTranslations);
 
@@ -109,13 +122,19 @@ class MessageExtractionTest extends TestCase
 
     public function testExtractOnlySpecificDomain()
     {
-        $translations = $this->scanner->extract([
-            new ScanItem($this->getDummyFile('multi-domains.php', 'mixed-domains')),
-        ], ['domain1', 'domain3']);
+        $translations = $this->scanner->extract(
+            [
+                new ScanItem($this->getDummyFile('multi-domains.php', 'mixed-domains')),
+            ],
+            ['domain1', 'domain3']
+        );
 
-        $domainsFound = array_map(function (Translations $t) {
-            return $t->getDomain() . '|' . $t->count();
-        }, $translations);
+        $domainsFound = array_map(
+            function (Translations $t) {
+                return $t->getDomain() . '|' . $t->count();
+            },
+            $translations
+        );
 
         self::assertContains('domain1|2', $domainsFound, 'Domain 1 was found with two strings');
         self::assertContains('domain3|1', $domainsFound, 'Domain 3 was found with one string');

@@ -160,8 +160,8 @@ class StorageTest extends TestCase
         $this->storage->saveTranslatedSingle($locale, $domain, $t2);
 
         $allTs = $this->storage->getAll($locale, $domain);
-        /** @var Translation $tResult */
-        $tResult = reset($allTs);
+
+        $tResult = $allTs->find('', 'O1');
 
         self::assertTrue($tResult->isDisabled(), 'Translation is still disabled');
         self::assertEquals($t2->getTranslation(), $tResult->getTranslation(), 'Translation is updated');
