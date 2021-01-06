@@ -189,13 +189,18 @@ class MessageManager
     /**
      * Build MO translation files for each locale and domain
      *
-     * @throws GettextCmsException
+     * @param array|null $locales
+     * @throws Exceptions\InvalidPathException
      */
-    public function buildTranslationFiles()
+    public function buildTranslationFiles(array $locales = null)
     {
         $builder = new MessageBuilder($this->config, $this->storage, $this->revisions);
 
-        foreach ($this->config->getLocales() as $locale) {
+        if ($locales === null) {
+            $locales = $this->config->getLocales();
+        }
+
+        foreach ($locales as $locale) {
             $domains = $this->config->getOtherDomains();
             $domains[] = $this->config->getDefaultDomain();
 
