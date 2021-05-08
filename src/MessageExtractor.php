@@ -116,6 +116,11 @@ class MessageExtractor
 
         $options = [
             'extractComments' => '', // This extracts comments above function call
+            // HTML attribute prefixes we parse as JS which could contain translations (are JS expressions)
+            'attributePrefixes' => [
+                ':',
+                'v-',
+            ],
         ];
 
         if ($functions) {
