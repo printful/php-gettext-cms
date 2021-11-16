@@ -1,6 +1,6 @@
 <?php /** @noinspection PhpUnhandledExceptionInspection */
 
-namespace TestCases;
+namespace Printful\GettextCms\Tests\TestCases;
 
 use Gettext\Translation;
 use Gettext\Translations;
@@ -23,7 +23,7 @@ class JsMessageTest extends TestCase
     /** @var MessageStorage */
     private $storage;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -44,7 +44,7 @@ class JsMessageTest extends TestCase
         ]);
 
         // Translate and store all
-        foreach ($translationsByDomain as $k => $v) {
+        foreach ($translationsByDomain as $v) {
             /** @var Translation[]|Translations $v */
             $v->setLanguage('en_US');
             foreach ($v as $v2) {

@@ -45,7 +45,7 @@ class BuilderTest extends TestCase
     /** @var string */
     private $domain;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -158,7 +158,7 @@ class BuilderTest extends TestCase
         $this->config->shouldReceive('getDefaultLocale')->andReturn('en_EN')->byDefault();
         $this->config->shouldReceive('getMoDirectory')->andReturn('whatever')->never();
 
-        // If there were an attempt to export, error would happend because mo directory does not exist
+        // If there were an attempt to export, error would happen because mo directory does not exist
         self::assertTrue($this->exporter->export('en_EN', 'domain'), 'Default domain is not exported');
     }
 
@@ -180,7 +180,7 @@ class BuilderTest extends TestCase
         }
     }
 
-    private function getMoPathname($domain)
+    private function getMoPathname($domain): string
     {
         return $this->locale . '/LC_MESSAGES/' . $domain . '.mo';
     }

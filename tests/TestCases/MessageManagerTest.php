@@ -1,7 +1,7 @@
 <?php
 /** @noinspection PhpUnhandledExceptionInspection */
 
-namespace TestCases;
+namespace Printful\GettextCms\Tests\TestCases;
 
 use Gettext\Generators\Po;
 use Gettext\Translations;
@@ -24,7 +24,7 @@ class MessageManagerTest extends TestCase
     /** @var string */
     private $zipPathname;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -43,7 +43,7 @@ class MessageManagerTest extends TestCase
         $this->deleteDirectory($this->tempDir);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->cleanup();
         parent::tearDown();

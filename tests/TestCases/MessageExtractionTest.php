@@ -22,7 +22,7 @@ class MessageExtractionTest extends TestCase
 
     const DOMAIN_DEFAULT = 'default';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

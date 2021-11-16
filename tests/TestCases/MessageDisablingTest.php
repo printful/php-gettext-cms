@@ -34,7 +34,7 @@ class MessageDisablingTest extends TestCase
     /** @var MessageRepositoryInterface */
     private $repository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -169,7 +169,7 @@ class MessageDisablingTest extends TestCase
      * @param $original
      * @return MessageItem|null
      */
-    private function findOneByMessage($locale, $domain, $original)
+    private function findOneByMessage($locale, $domain, $original): ?MessageItem
     {
         $all = $this->repository->getAll($locale, $domain);
         foreach ($all as $v) {

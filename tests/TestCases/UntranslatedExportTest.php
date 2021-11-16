@@ -29,7 +29,7 @@ class UntranslatedExportTest extends TestCase
     /** @var string */
     private $locale;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

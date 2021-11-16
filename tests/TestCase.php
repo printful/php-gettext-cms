@@ -2,9 +2,10 @@
 
 namespace Printful\GettextCms\Tests;
 
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem;
+use FilesystemIterator;
 use Mockery;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 abstract class TestCase extends \PHPUnit\Framework\TestCase
 {
@@ -15,14 +16,21 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      */
     protected function deleteDirectory($path)
     {
-        $path = rtrim($path, '/');
+        if (!is_dir($path)) {
+            return;
+        }
 
-        $childDirName = pathinfo($path, PATHINFO_BASENAME);
-        $parentDir = dirname($path);
+        $iterator = new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS);
+        $files = new RecursiveIteratorIterator($iterator, RecursiveIteratorIterator::CHILD_FIRST);
+        foreach ($files as $file) {
+            if ($file->isDir()) {
+                rmdir($file->getRealPath());
+            } else {
+                unlink($file->getRealPath());
+            }
+        }
 
-        $adapter = new Local($parentDir);
-        $filesystem = new Filesystem($adapter);
-        $filesystem->deleteDir($childDirName);
+        rmdir($path);
     }
 
     protected function getDummyFile(string $filename = 'dummy-file.php', string $directory = 'dummy-directory'): string
@@ -30,7 +38,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
         return __DIR__ . '/assets/' . $directory . '/' . $filename;
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         Mockery::close();
         parent::tearDown();

@@ -39,7 +39,7 @@ class LocaleLoaderTest extends TestCase
     /** @var MessageRevisions */
     private $revisions;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -61,7 +61,7 @@ class LocaleLoaderTest extends TestCase
         mkdir($this->dir);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->deleteDirectory($this->dir);
         parent::tearDown();

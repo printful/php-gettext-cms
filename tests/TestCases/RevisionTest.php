@@ -20,7 +20,7 @@ class RevisionTest extends TestCase
     /** @var string */
     private $tempDir;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -35,7 +35,7 @@ class RevisionTest extends TestCase
         mkdir($this->tempDir);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->deleteDirectory($this->tempDir);
         parent::tearDown();

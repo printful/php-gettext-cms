@@ -29,7 +29,7 @@ class TranslationSavingTest extends TestCase
     /** @var TranslatedMessageImporter */
     private $importer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

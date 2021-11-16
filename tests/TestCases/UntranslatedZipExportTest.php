@@ -38,7 +38,7 @@ class UntranslatedZipExportTest extends TestCase
 
     private $zipPathname;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -58,7 +58,7 @@ class UntranslatedZipExportTest extends TestCase
         @unlink($pathname);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         @unlink($this->zipPathname);
         parent::tearDown();
@@ -75,7 +75,7 @@ class UntranslatedZipExportTest extends TestCase
             new UntranslatedMessageExporter($this->storage)
         );
 
-        self::assertFileNotExists($this->zipPathname, 'Zip file does not exist');
+        self::assertFileDoesNotExist($this->zipPathname, 'Zip file does not exist');
 
         $zipExporter->export($this->zipPathname, $this->locale);
 

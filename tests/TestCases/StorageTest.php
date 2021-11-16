@@ -21,7 +21,7 @@ class StorageTest extends TestCase
     /** @var MessageStorage */
     private $storage;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

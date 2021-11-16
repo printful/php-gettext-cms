@@ -27,7 +27,7 @@ class ImporterTest extends TestCase
     /** @var MessageExtractor */
     private $extractor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

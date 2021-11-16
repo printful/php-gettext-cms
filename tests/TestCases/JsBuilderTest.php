@@ -18,7 +18,7 @@ class JsBuilderTest extends TestCase
     /** @var MessageJsBuilder */
     private $builder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -39,17 +39,17 @@ class JsBuilderTest extends TestCase
 
         $js = $this->builder->exportJsonp($this->locale, $domains, 'loaded');
 
-        self::assertNotContains('non-js', $js, 'Non-js translation is not included');
+        self::assertStringNotContainsString('non-js', $js, 'Non-js translation is not included');
 
         foreach ($domains as $domain) {
             $ts = $this->storage->getEnabledTranslatedJs($this->locale, $domain);
 
-            self::assertTrue(count($ts) > 0, 'Domain ' . $domain . ' has translations');
+            self::assertNotEmpty($ts, 'Domain ' . $domain . ' has translations');
 
             foreach ($ts as $t) {
                 /** @var Translation $t */
-                self::assertContains($t->getOriginal(), $js, $t->getOriginal() . ' is within JS');
-                self::assertContains($t->getTranslation(), $js, $t->getTranslation() . ' translation is within JS');
+                self::assertStringContainsString($t->getOriginal(), $js, $t->getOriginal() . ' is within JS');
+                self::assertStringContainsString($t->getTranslation(), $js, $t->getTranslation() . ' translation is within JS');
             }
         }
     }

@@ -15,7 +15,7 @@ class FileResolvingTest extends TestCase
     /** @var MessageExtractor */
     private $scanner;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

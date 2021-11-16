@@ -2,20 +2,20 @@
 
 namespace Printful\GettextCms;
 
+use FilesystemIterator;
 use Gettext\Extractors\ExtractorInterface;
 use Gettext\Extractors\ExtractorMultiInterface;
 use Gettext\Extractors\JsCode;
 use Gettext\Extractors\PhpCode;
 use Gettext\Extractors\VueJs;
 use Gettext\Translations;
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem;
-use League\Flysystem\Plugin\ListFiles;
 use Printful\GettextCms\Exceptions\GettextCmsException;
 use Printful\GettextCms\Exceptions\InvalidPathException;
 use Printful\GettextCms\Exceptions\UnknownExtractorException;
 use Printful\GettextCms\Interfaces\MessageConfigInterface;
 use Printful\GettextCms\Structures\ScanItem;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 /**
  * Class extracts gettext function calls from source files and converts them to Translation objects
@@ -55,7 +55,7 @@ class MessageExtractor
         }
 
         /** @var Translations[] $allTranslations [domain => translations, ...] */
-        $allTranslations = array_reduce($domains, function (&$carry, string $domain) use ($defaultDomain) {
+        $allTranslations = array_reduce($domains, function ($carry, string $domain) use ($defaultDomain) {
             $translations = new Translations();
 
             // When we scan for default domain, we have to specify an empty value
@@ -160,23 +160,32 @@ class MessageExtractor
     {
         $dir = realpath($item->path);
 
-        $adapter = new Local($dir);
-        $filesystem = new Filesystem($adapter);
-        $filesystem->addPlugin(new ListFiles());
-
-        $files = $filesystem->listFiles('', $item->recursive);
+        if ($item->recursive) {
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS)
+            );
+        } else {
+            $iterator = new FilesystemIterator($dir, FilesystemIterator::SKIP_DOTS);
+        }
 
         // If no extensions are given, fallback to known extensions
         $extensions = $item->extensions ?: array_keys(self::EXTRACTORS);
 
-        // If extensions are set, filter other files out
-        $files = array_filter($files, function ($file) use ($item, $extensions) {
-            return isset($file['extension']) && in_array($file['extension'], $extensions);
-        });
+        $matchingPathnames = [];
 
-        return array_map(function ($file) use ($dir) {
-            return $dir . DIRECTORY_SEPARATOR . $file['path'];
-        }, $files);
+        foreach ($iterator as $file) {
+            if ($file->isDir()) {
+                continue;
+            }
+
+            $extension = strtolower($file->getExtension());
+
+            if ($extensions && in_array($extension, $extensions)) {
+                $matchingPathnames[] = $file->getRealPath();
+            }
+        }
+
+        return $matchingPathnames;
     }
 
     /**
