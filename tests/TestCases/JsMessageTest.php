@@ -40,6 +40,7 @@ class JsMessageTest extends TestCase
         $translationsByDomain = $this->scanner->extract([
             new ScanItem($this->getDummyFile('js/dummy.js')), // 1 JS message
             new ScanItem($this->getDummyFile('js/dummy.vue')), // 2 JS messages
+            new ScanItem($this->getDummyFile('js/dummy-ts.ts')),
             new ScanItem($this->getDummyFile('dummy-file.php')), // PHP messages, should be ignored
         ]);
 
@@ -55,9 +56,10 @@ class JsMessageTest extends TestCase
 
         $translations = $this->storage->getEnabledTranslatedJs('en_US', 'domain');
 
-        self::assertCount(3, $translations, 'The number of translations extracted does not match');
+        self::assertCount(4, $translations, 'The number of translations extracted does not match');
         self::assertNotFalse($translations->find('ctx', 'JS 1'), 'Translation not found');
         self::assertNotFalse($translations->find('', 'JS 2'), 'Translation not found');
         self::assertNotFalse($translations->find('', 'JS 3'), 'Translation not found');
+        self::assertNotFalse($translations->find('', 'JS TS'), 'Translation not found');
     }
 }
