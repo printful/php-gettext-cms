@@ -334,7 +334,7 @@ class MessageStorage
     {
         $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 
-        return in_array($extension, ['vue', 'js'], true);
+        return in_array($extension, ['vue', 'js', 'ts'], true);
     }
 
     /**

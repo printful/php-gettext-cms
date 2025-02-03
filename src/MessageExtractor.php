@@ -24,6 +24,7 @@ class MessageExtractor
 {
     const EXTRACTORS = [
         'js' => JsCode::class,
+        'ts' => JsCode::class,
         'vue' => VueJs::class,
         'php' => PhpCode::class,
     ];
