@@ -55,9 +55,9 @@ class JsMessageTest extends TestCase
 
         $translations = $this->storage->getEnabledTranslatedJs('en_US', 'domain');
 
-        self::assertCount(3, $translations, '3 translations extracted');
-        self::assertNotFalse($translations->find('ctx', 'JS 1'), 'Translation found');
-        self::assertNotFalse($translations->find('', 'JS 2'), 'Translation found');
-        self::assertNotFalse($translations->find('', 'JS 3'), 'Translation found');
+        self::assertCount(3, $translations, 'The number of translations extracted does not match');
+        self::assertNotFalse($translations->find('ctx', 'JS 1'), 'Translation not found');
+        self::assertNotFalse($translations->find('', 'JS 2'), 'Translation not found');
+        self::assertNotFalse($translations->find('', 'JS 3'), 'Translation not found');
     }
 }
