@@ -17,14 +17,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Setup locales
+    - name: Add other locales for testing purposes
       run: |
         sudo apt-get update
         sudo apt-get install -y locales
-        sudo locale-gen de_DE.UTF-8
-        sudo update-locale LANG=de_DE.UTF-8
-        export LANG=de_DE.UTF-8
-        export LC_ALL=de_DE.UTF-8
+        sudo locale-gen de_DE.UTF-8 es_ES.UTF-8
+        sudo update-locale
         
     - name: Cache Composer packages
       id: composer-cache
